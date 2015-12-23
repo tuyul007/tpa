@@ -78,6 +78,16 @@
             android:onClick="register"
             android:background="#ffffff"
             android:textSize="20dp" />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Register"
+            android:id="@+id/buttonCACAT"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            android:onClick="register"
+            android:background="#ffffff"
+            android:textSize="20dp" />
 
     </LinearLayout>
 
