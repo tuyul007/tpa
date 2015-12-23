@@ -9,8 +9,13 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
+import com.firebase.client.ChildEventListener;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
 import com.shiperus.ark.jchat3.R;
 
+import edu.bluejack151.JChat.jchat3.Helper.UserAccount;
 import edu.bluejack151.JChat.jchat3.Helper.Validator;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -23,6 +28,7 @@ public class RegisterActivity extends AppCompatActivity {
     RadioButton radioFemale;
     Button btnSubmit;
     Button btnReset;
+    Boolean successRegister;
 
     private void initComponent(){
         userId = (EditText)findViewById(R.id.fieldRegisUserID);
@@ -34,14 +40,48 @@ public class RegisterActivity extends AppCompatActivity {
 
         btnSubmit = (Button)findViewById(R.id.submitRegisButton);
         btnReset = (Button)findViewById(R.id.resetRegisButton);
+        successRegister = false;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Firebase.setAndroidContext(this);
         setContentView(R.layout.activity_register);
 
         initComponent();
+
+        final Firebase userRef = new Firebase("https://jchatapps.firebaseio.com/user");
+
+        userRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                if (successRegister) {
+                    Intent i = new Intent(getApplicationContext(), MainActivity.class);
+                    startActivity(i);
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
 
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,12 +99,25 @@ public class RegisterActivity extends AppCompatActivity {
                     message = "Password must be alphanumeric, 4-20 character";
                 } else {
                     message = "Register Success";
+                    successRegister = true;
                 }
                 Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
                 if (message.equals("Register Success")) {
                     //insertDatabase
-                    Intent i = new Intent(getApplicationContext(),MainActivity.class);
-                    startActivity(i);
+                    String gender = "Male";
+                    if (radioFemale.isChecked()) gender = "Female";
+
+                    userRef.child(userId.getText().toString())
+                            .setValue(new UserAccount(
+                                    userId.getText().toString(),
+                                    displayName.getText().toString(),
+                                    email.getText().toString(),
+                                    password.getText().toString(),
+                                    gender,
+                                    "",
+                                    1,
+                                    1
+                            ));
                 }
             }
         });
