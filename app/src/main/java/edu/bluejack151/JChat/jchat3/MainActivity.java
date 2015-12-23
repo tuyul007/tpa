@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
@@ -26,21 +27,64 @@ import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.firebase.client.ChildEventListener;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
+import com.google.gson.Gson;
 import com.shiperus.ark.jchat3.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
+import edu.bluejack151.JChat.jchat3.Helper.UserAccount;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    SharedPreferences sharedpreferences;
+    SharedPreferences loginPreferences;
+    File f;
+    SharedPreferences.Editor userSessionEditor;
+    UserAccount loginAccount;
 
     CallbackManager callbackManager;
     Intent pageLoginFacebook;
+    AccessToken accessToken;
+
+    //ProfileTracker profileTracker;
+    LoginButton fbButton;
+    public static String preferencesName="LoginPref";
+    SharedPreferences.Editor editor;
+
+    EditText email;
+    EditText password;
+    Firebase userRef;
+    Button manualLoginButton;
+    HashMap<String,UserAccount> userAccounts;
+
+    void initComponent(){
+        email = (EditText)findViewById(R.id.loginEmail);
+        password = (EditText)findViewById(R.id.loginPassword);
+        manualLoginButton = (Button)findViewById(R.id.manualLoginButton);
+        userAccounts = new HashMap<>();
+
+        f = new File("/data/data/"+getPackageName()+"/shared_prefs/user_session.xml");
+
+        if(f.exists()){
+            Intent i = new Intent(getApplicationContext(),HomeActivity.class);
+            startActivity(i);
+        }else {
+            loginPreferences = getSharedPreferences("user_session",MODE_PRIVATE);
+        }
+
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -65,34 +109,103 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
-
-    public void login(View v)
-    {
-        Intent intent=new Intent(this,HomeActivity.class);
-        startActivity(intent);
+    boolean loginUserAccount(String email,String password){
+        for (Map.Entry<String,UserAccount> data : userAccounts.entrySet()){
+            loginAccount = data.getValue();
+            if(loginAccount.getEmail().equals(email)
+                    && loginAccount.getPassword().equals(password)){
+                return true;
+            }
+        }
+        return false;
     }
 
-    AccessToken accessToken;
-//    ProfileTracker profileTracker;
-    LoginButton fbButton;
-    public static String preferencesName="LoginPref";
-    SharedPreferences.Editor edit;
-    SharedPreferences.Editor editor;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-         editor = getSharedPreferences(preferencesName, MODE_PRIVATE).edit();
 
 
         super.onCreate(savedInstanceState);
-        pageLoginFacebook =new Intent(this,HomeActivity.class);
+        Firebase.setAndroidContext(this);
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_main);
+
+        editor = getSharedPreferences(preferencesName, MODE_PRIVATE).edit();
+
+        initComponent();
+
+        userRef = new Firebase("https://jchatapps.firebaseio.com/user");
+
+        userRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
+
+        userRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                userAccounts.put(dataSnapshot.getKey(), dataSnapshot.getValue(UserAccount.class));
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
+
+        //manual-login
+
+        manualLoginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String message = "";
+                if(email.getText().toString().equals("") || password.getText().toString().equals("")){
+                    message = "All field must be filled";
+                }else if(!loginUserAccount(email.getText().toString(),password.getText().toString())){
+                    message = "Invalid username/password";
+                }else{
+                    message = "Login Success";
+                }
+                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                if(message.equals("Login Success")){
+                    userSessionEditor = loginPreferences.edit();
+                    String user_session = new Gson().toJson(loginAccount);
+                    userSessionEditor.putString("user_session", user_session);
+                    userSessionEditor.commit();
+
+                    Intent i = new Intent(getApplicationContext(),HomeActivity.class);
+                    startActivity(i);
+                }
+            }
+        });
+
+        //facebook - login
+        pageLoginFacebook =new Intent(this,HomeActivity.class);
         callbackManager = CallbackManager.Factory.create();
 
-
         //Toast.makeText(getApplicationContext(),"Asu DEFFFF",Toast.LENGTH_LONG).show();
-       fbButton=(LoginButton)findViewById(R.id.login_button);
+        fbButton=(LoginButton)findViewById(R.id.login_button);
         fbButton.setReadPermissions(Arrays.asList("email", "user_photos", "public_profile"));
 
 

@@ -27,6 +27,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.shiperus.ark.jchat3.R;
 
 import java.io.InputStream;
@@ -34,10 +35,17 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import android.support.design.widget.TabLayout;
 
+import edu.bluejack151.JChat.jchat3.Helper.UserAccount;
+
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     SharedPreferences shrd;
+
+    //BUAT USER SESSION
+    SharedPreferences userSessionPreferences;
+    SharedPreferences.Editor userSessionEditor;
+    UserAccount userSessionAccount;
 
     public static Bitmap getFacebookProfilePicture(String userID){
         URL imageURL = null;
@@ -53,12 +61,24 @@ public class HomeActivity extends AppCompatActivity
 
         return bitmap;
     }
+
+    void initComponent(){
+        userSessionPreferences = getSharedPreferences("user_session",MODE_PRIVATE);
+        userSessionAccount = new Gson().fromJson(userSessionPreferences.getString("user_session", ""), UserAccount.class);
+
+        Toast.makeText(getApplicationContext(),"Welcome,"+userSessionAccount.getDisplayName(),Toast.LENGTH_SHORT).show();
+
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         shrd=getSharedPreferences(MainActivity.preferencesName, Context.MODE_PRIVATE);
+
 //        Toast.makeText(HomeActivity.this,shrd.getString("userID",null),Toast.LENGTH_LONG).show();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        initComponent();
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 //        setSupportActionBar(toolbar);
 
