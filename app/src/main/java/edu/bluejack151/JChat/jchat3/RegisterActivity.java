@@ -1,6 +1,7 @@
 package edu.bluejack151.JChat.jchat3;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -13,7 +14,17 @@ import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
+import com.firebase.client.snapshot.Index;
+import com.firebase.client.snapshot.IndexedNode;
+import com.firebase.client.snapshot.Node;
 import com.shiperus.ark.jchat3.R;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
 
 import edu.bluejack151.JChat.jchat3.Helper.UserAccount;
 import edu.bluejack151.JChat.jchat3.Helper.Validator;
@@ -29,6 +40,8 @@ public class RegisterActivity extends AppCompatActivity {
     Button btnSubmit;
     Button btnReset;
     Boolean successRegister;
+    String message;
+    HashMap<String,UserAccount> userAcc;
 
     private void initComponent(){
         userId = (EditText)findViewById(R.id.fieldRegisUserID);
@@ -40,7 +53,11 @@ public class RegisterActivity extends AppCompatActivity {
 
         btnSubmit = (Button)findViewById(R.id.submitRegisButton);
         btnReset = (Button)findViewById(R.id.resetRegisButton);
+
+        userAcc = new HashMap<>();
+
         successRegister = false;
+        message = "";
     }
 
     @Override
@@ -48,7 +65,6 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Firebase.setAndroidContext(this);
         setContentView(R.layout.activity_register);
-
         initComponent();
 
         final Firebase userRef = new Firebase("https://jchatapps.firebaseio.com/user");
@@ -59,6 +75,9 @@ public class RegisterActivity extends AppCompatActivity {
                 if (successRegister) {
                     Intent i = new Intent(getApplicationContext(), MainActivity.class);
                     startActivity(i);
+                } else {
+                    userAcc.put(dataSnapshot.getKey(), dataSnapshot.getValue(UserAccount.class));
+
                 }
             }
 
@@ -86,7 +105,7 @@ public class RegisterActivity extends AppCompatActivity {
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String message = "";
+                message = "";
                 if (!Validator.checkUserID(userId.getText().toString())) {
                     message = "User ID must be alphabet or numeric, 6-8 character";
                 } else if (!Validator.checkLength(displayName.getText().toString(), 3, 20) ||
@@ -97,12 +116,12 @@ public class RegisterActivity extends AppCompatActivity {
                 } else if (!Validator.checkLength(password.getText().toString(), 4, 20)
                         || !Validator.isAlphaNumeric(password.getText().toString())) {
                     message = "Password must be alphanumeric, 4-20 character";
+                } else if (userAcc.containsKey(userId.getText().toString())) {
+                    message = "User ID has already used";
                 } else {
                     message = "Register Success";
                     successRegister = true;
-                }
-                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-                if (message.equals("Register Success")) {
+
                     //insertDatabase
                     String gender = "Male";
                     if (radioFemale.isChecked()) gender = "Female";
@@ -118,7 +137,11 @@ public class RegisterActivity extends AppCompatActivity {
                                     1,
                                     1
                             ));
+
                 }
+                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+
+
             }
         });
 

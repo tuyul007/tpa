@@ -35,7 +35,6 @@ import java.util.Arrays;
 
 
 
-//ASUUUUUUUUUUUUUUuuu
 public class MainActivity extends AppCompatActivity {
 
     SharedPreferences sharedpreferences;
