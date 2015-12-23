@@ -3,7 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/jchat-project.iml" filepath="$PROJECT_DIR$/jchat-project.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tpa.iml" filepath="$PROJECT_DIR$/tpa.iml" />
     </modules>
   </component>
 </project>
