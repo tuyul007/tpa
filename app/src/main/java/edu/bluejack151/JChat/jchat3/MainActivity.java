@@ -67,8 +67,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void login(View v)
     {
-        //Intent intent=new Intent(this,HomeActivity.class);
-        //startActivity(intent);
+        Intent intent=new Intent(this,HomeActivity.class);
+        startActivity(intent);
     }
 
     AccessToken accessToken;

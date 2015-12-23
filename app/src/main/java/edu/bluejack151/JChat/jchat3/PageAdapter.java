@@ -27,7 +27,9 @@ public class PageAdapter extends FragmentStatePagerAdapter {
             case 1:
                 FragmentChat tab2 = new FragmentChat();
                 return tab2;
-
+            case 2:
+                FragmentFriend tab3 = new FragmentFriend();
+                return tab3;
             default:
                 return null;
         }
@@ -36,5 +38,19 @@ public class PageAdapter extends FragmentStatePagerAdapter {
     @Override
     public int getCount() {
         return mNumOfTabs;
+    }
+
+    @Override
+    public CharSequence getPageTitle(int position) {
+        switch (position) {
+            case 0:
+                return  "Friend";
+            case 1:
+                return  "Chat";
+            case 2:
+                return  "Friend";
+            default:
+                return null;
+        }
     }
 }
