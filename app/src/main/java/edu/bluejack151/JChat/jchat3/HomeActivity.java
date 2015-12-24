@@ -69,6 +69,8 @@ public class HomeActivity extends AppCompatActivity
         Toast.makeText(getApplicationContext(),"Welcome,"+userSessionAccount.getDisplayName(),Toast.LENGTH_SHORT).show();
 
     }
+
+    static Toolbar toolbar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         shrd=getSharedPreferences(MainActivity.preferencesName, Context.MODE_PRIVATE);
@@ -78,10 +80,9 @@ public class HomeActivity extends AppCompatActivity
         setContentView(R.layout.activity_home);
 
         initComponent();
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar); //tes lagi , kemaren2 soalnya null skrg kgk ;__;
+        getSupportActionBar().setTitle("Friend");
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -92,10 +93,40 @@ public class HomeActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         ViewPager viewPager=(ViewPager) findViewById(R.id.pager);
-        viewPager.setAdapter(new PageAdapter(getSupportFragmentManager(),3));
+        viewPager.setAdapter(new PageAdapter(getSupportFragmentManager(),3,HomeActivity.this));
+
+        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                switch(position) {
+                    case 0:
+
+                        getSupportActionBar().setTitle("Friend");
+                        break;
+                    case 1:
+                        getSupportActionBar().setTitle("Chat");
+                        break;
+                    case 2:
+                        getSupportActionBar().setTitle("Profile");
+                        break;
+
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
 
         TabLayout tabLayout=(TabLayout) findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);
+
 
 
     }
@@ -138,17 +169,9 @@ public class HomeActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.nav_account_setting) {
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
+        } else if (id == R.id.nav_logout) {
 
         }
 
