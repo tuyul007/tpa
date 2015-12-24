@@ -1,6 +1,7 @@
 package edu.bluejack151.JChat.jchat3;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -30,6 +31,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.shiperus.ark.jchat3.R;
 
+import java.io.File;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -172,6 +174,12 @@ public class HomeActivity extends AppCompatActivity
         if (id == R.id.nav_account_setting) {
             // Handle the camera action
         } else if (id == R.id.nav_logout) {
+            File f;
+            f = new File("/data/data/"+getPackageName()+"/shared_prefs/user_session.xml");
+            f.delete();
+            Intent i = new Intent(getApplicationContext(),MainActivity.class);
+            startActivity(i);
+            finish();
 
         }
 

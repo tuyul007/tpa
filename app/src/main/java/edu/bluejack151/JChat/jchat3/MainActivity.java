@@ -76,9 +76,12 @@ public class MainActivity extends AppCompatActivity {
 
         f = new File("/data/data/"+getPackageName()+"/shared_prefs/user_session.xml");
 
+
+
         if(f.exists()){
             Intent i = new Intent(getApplicationContext(),HomeActivity.class);
             startActivity(i);
+            finish();
         }else {
             loginPreferences = getSharedPreferences("user_session",MODE_PRIVATE);
         }
@@ -196,6 +199,7 @@ public class MainActivity extends AppCompatActivity {
 
                     Intent i = new Intent(getApplicationContext(),HomeActivity.class);
                     startActivity(i);
+                    finish();
                 }
             }
         });
