@@ -127,7 +127,7 @@ public class HomeActivity extends AppCompatActivity
 
 
         userRef  = new Firebase("https://jchatapps.firebaseio.com/user");
-        userRef.addValueEventListener(new ValueEventListener() {
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(userCount == 0){
@@ -158,7 +158,7 @@ public class HomeActivity extends AppCompatActivity
                                 tempFriendList.get(FragmentFriend.FRIEND).getFriendList().size() - 1
                         ).setFriendIdentity(f);
                         friendCount++;
-                        //toastMsg(friendAccountList.size()+" " +userSessionAccount.getTotalGroup()+ " " +friendCount + " " +userCount);
+                        toastMsg(f.getFriendId()+" " +userSessionAccount.getTotalGroup()+ " " +friendCount + " " +userCount);
                     }
                 }
 
@@ -223,15 +223,12 @@ public class HomeActivity extends AppCompatActivity
 
     void selectAllFriend(){
         for(int i=0; i< tempFriendList.get(FragmentFriend.FRIEND).getFriendList().size(); i++){
-            if(tempFriendList.get(FragmentFriend.FRIEND).getFriendList().get(i).getFriendIdentity().getBlocked() == 0) {
                 tempFriendList.get(FragmentFriend.FRIEND).getFriendList().get(i).setFriendDetail(
                         friendAccountList.get(
                                 tempFriendList.get(
                                         FragmentFriend.FRIEND
                                 ).getFriendList().get(i).getFriendIdentity().getFriendId())
                 );
-
-            }
         }
     }
 

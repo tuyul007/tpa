@@ -162,9 +162,8 @@ public class FragmentFriend  extends android.support.v4.app.Fragment{
         return view;
     }
 
-    void managePopUpMenu(final int group,int child){
+    void managePopUpMenu(int group,int child){
         fl = listGroupAndFriend.get(group).getFriendList().get(child);
-
         if(group == GROUP){
             dialog.setTitle(fl.getGroupIdentity().getGroupName());
             popUpMenu1.setText("Chat");
@@ -172,6 +171,21 @@ public class FragmentFriend  extends android.support.v4.app.Fragment{
                 popUpMenu1.setText("Accept Invitation");
             }
             popUpMenu2.setVisibility(View.GONE);
+            popUpMenu1.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(popUpMenu1.getText().equals("Accept Invitation")){
+                        fl.getGroupIdentity().setAccept(1);
+                        groupRef.child(fl.getGroupIdentity().getGroupId() + "_" +
+                                fl.getGroupIdentity().getUserId()).setValue(fl.getGroupIdentity());
+                        adapter.notifyDataSetChanged();
+                        dialog.dismiss();
+                    }else{
+                        //chat
+                        toastMsg("group chat");
+                    }
+                }
+            });
         }else{
             popUpMenu2.setVisibility(View.VISIBLE);
             dialog.setTitle(fl.getFriendDetail().getDisplayName());
@@ -180,7 +194,13 @@ public class FragmentFriend  extends android.support.v4.app.Fragment{
             if(fl.getFriendIdentity().getBlocked() == 1){
                 popUpMenu2.setText("Unblock");
             }
-
+            popUpMenu1.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //chat
+                    toastMsg("friend chat");
+                }
+            });
             popUpMenu2.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -192,21 +212,11 @@ public class FragmentFriend  extends android.support.v4.app.Fragment{
                     friendRef.child(HomeActivity.userSessionAccount.getUserId() + "_" +
                             fl.getFriendIdentity().getFriendId()).setValue(fl.getFriendIdentity());
 
+                    adapter.notifyDataSetChanged();
                     dialog.dismiss();
                 }
             });
         }
-
-        popUpMenu1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(group == GROUP){
-
-                }else{
-
-                }
-            }
-        });
     }
 
     //class buat setting expandedviewlist nya
