@@ -158,7 +158,6 @@ public class HomeActivity extends AppCompatActivity
                                 tempFriendList.get(FragmentFriend.FRIEND).getFriendList().size() - 1
                         ).setFriendIdentity(f);
                         friendCount++;
-                        toastMsg(f.getFriendId()+" " +userSessionAccount.getTotalGroup()+ " " +friendCount + " " +userCount);
                     }
                 }
 

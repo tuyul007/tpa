@@ -162,25 +162,37 @@ public class FragmentFriend  extends android.support.v4.app.Fragment{
         return view;
     }
 
-    void managePopUpMenu(int group,int child){
+    void managePopUpMenu(final int group, final int child){
         fl = listGroupAndFriend.get(group).getFriendList().get(child);
         if(group == GROUP){
             dialog.setTitle(fl.getGroupIdentity().getGroupName());
             popUpMenu1.setText("Chat");
-            if(fl.getGroupIdentity().getAccept() == 0){
-                popUpMenu1.setText("Accept Invitation");
-            }
             popUpMenu2.setVisibility(View.GONE);
+            if(fl.getGroupIdentity().getAccept() == 0){
+                popUpMenu1.setText("Accept");
+                popUpMenu2.setText("Decline");
+                popUpMenu2.setVisibility(View.VISIBLE);
+                popUpMenu2.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        listGroupAndFriend.get(group).getFriendList().remove(child);
+                        groupRef.child(fl.getGroupIdentity().getGroupId() + "_" +
+                                fl.getGroupIdentity().getUserId()).removeValue();
+                        adapter.notifyDataSetChanged();
+                        dialog.dismiss();
+                    }
+                });
+            }
             popUpMenu1.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(popUpMenu1.getText().equals("Accept Invitation")){
+                    if (popUpMenu1.getText().equals("Accept")) {
                         fl.getGroupIdentity().setAccept(1);
                         groupRef.child(fl.getGroupIdentity().getGroupId() + "_" +
                                 fl.getGroupIdentity().getUserId()).setValue(fl.getGroupIdentity());
                         adapter.notifyDataSetChanged();
                         dialog.dismiss();
-                    }else{
+                    } else {
                         //chat
                         toastMsg("group chat");
                     }
