@@ -192,7 +192,7 @@ public class FragmentFriend  extends android.support.v4.app.Fragment{
                         groupRef.child(fl.getGroupIdentity().getGroupId() + "_" +
                                 fl.getGroupIdentity().getUserId()).setValue(fl.getGroupIdentity());
 
-                        HomeActivity.userSessionAccount.setTotalGroup((HomeActivity.userSessionAccount.getTotalGroup()+1));
+                        HomeActivity.userSessionAccount.setTotalGroup((HomeActivity.userSessionAccount.getTotalGroup() + 1));
                         userRef.child(HomeActivity.userSessionAccount.getUserId()).setValue(HomeActivity.userSessionAccount);
                         setSession();
 
@@ -212,12 +212,11 @@ public class FragmentFriend  extends android.support.v4.app.Fragment{
                             fl.getGroupIdentity().getUserId()).removeValue();
 
                     if(popUpMenu2.getText().equals("Leave Group")){
-                        HomeActivity.userSessionAccount.setTotalGroup((HomeActivity.userSessionAccount.getTotalGroup()-1));
+                        HomeActivity.userSessionAccount.setTotalGroup((HomeActivity.userSessionAccount.getTotalGroup() - 1));
                         userRef.child(HomeActivity.userSessionAccount.getUserId()).setValue(HomeActivity.userSessionAccount);
-                        HomeActivity.totalGroup--;
                         setSession();
                     }
-
+                    HomeActivity.totalGroup--;
                     adapter.notifyDataSetChanged();
                     dialog.dismiss();
                 }
