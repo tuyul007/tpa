@@ -12,9 +12,12 @@ public class UserAccount {
     private String profilePicture;
     private int notification;
     private int isPublic;
+    private int totalFriend;
+    private int totalGroup;
 
     public UserAccount(){}
-    public UserAccount(String userId, String displayName, String email, String password, String gender, String profilePicture, int notification, int isPublic) {
+
+    public UserAccount(String userId, String displayName, String email, String password, String gender, String profilePicture, int notification, int isPublic, int totalFriend, int totalGroup) {
         this.userId = userId;
         this.displayName = displayName;
         this.email = email;
@@ -23,6 +26,8 @@ public class UserAccount {
         this.profilePicture = profilePicture;
         this.notification = notification;
         this.isPublic = isPublic;
+        this.totalFriend = totalFriend;
+        this.totalGroup = totalGroup;
     }
 
     public String getUserId() {
@@ -87,5 +92,21 @@ public class UserAccount {
 
     public void setIsPublic(int isPublic) {
         this.isPublic = isPublic;
+    }
+
+    public int getTotalFriend() {
+        return totalFriend;
+    }
+
+    public void setTotalFriend(int totalFriend) {
+        this.totalFriend = totalFriend;
+    }
+
+    public int getTotalGroup() {
+        return totalGroup;
+    }
+
+    public void setTotalGroup(int totalGroup) {
+        this.totalGroup = totalGroup;
     }
 }

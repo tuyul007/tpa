@@ -1,5 +1,6 @@
 package edu.bluejack151.JChat.jchat3;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -7,12 +8,16 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.Image;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,8 +31,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.client.ChildEventListener;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
+import com.firebase.client.snapshot.IndexedNode;
 import com.google.gson.Gson;
 import com.shiperus.ark.jchat3.R;
 
@@ -35,19 +48,43 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import android.support.design.widget.TabLayout;
 
+import org.w3c.dom.Node;
+
+import edu.bluejack151.JChat.jchat3.AdapterHelper.FriendListItem;
+import edu.bluejack151.JChat.jchat3.AdapterHelper.ParentFriendListItem;
+import edu.bluejack151.JChat.jchat3.Helper.Friend;
+import edu.bluejack151.JChat.jchat3.Helper.GroupIdentity;
 import edu.bluejack151.JChat.jchat3.Helper.UserAccount;
 
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    SharedPreferences shrd;
+    void toastMsg(String msg){
+        Toast.makeText(getApplicationContext(),msg,Toast.LENGTH_SHORT).show();
+    }
 
+    SharedPreferences shrd;
+    Firebase friendRef;
+    Firebase userRef;
+    Firebase groupRef;
+    ProgressDialog progressDialog;
+    Handler handler;
+    TextView loadingHandler;
+
+    public static ArrayList<ParentFriendListItem> tempFriendList;
+    public static HashMap<String,UserAccount> friendAccountList;
+    public static Integer friendCount = 0,groupCount = 0,userCount = 0;
+    Boolean ready;
     //BUAT USER SESSION
     SharedPreferences userSessionPreferences;
-    SharedPreferences.Editor userSessionEditor;
-    UserAccount userSessionAccount;
+    public static UserAccount userSessionAccount;
+
+
 
     public static Bitmap getFacebookProfilePicture(String userID){
         URL imageURL = null;
@@ -64,12 +101,138 @@ public class HomeActivity extends AppCompatActivity
         return bitmap;
     }
 
+    void initStatic(){
+        HomeActivity.tempFriendList = null;
+        HomeActivity.friendAccountList = null;
+        HomeActivity.friendCount = 0;HomeActivity.groupCount = 0;HomeActivity.userCount = 0;
+
+    }
+
     void initComponent(){
-        userSessionPreferences = getSharedPreferences("user_session",MODE_PRIVATE);
+        userSessionPreferences = getSharedPreferences("user_session", MODE_PRIVATE);
         userSessionAccount = new Gson().fromJson(userSessionPreferences.getString("user_session", ""), UserAccount.class);
+        loadingHandler = (TextView)findViewById(R.id.loadingHandler);
+        loadingHandler.setText("");
 
-        Toast.makeText(getApplicationContext(),"Welcome,"+userSessionAccount.getDisplayName(),Toast.LENGTH_SHORT).show();
+        ready = false;
 
+        tempFriendList = new ArrayList<>();
+        friendAccountList = new HashMap<>();
+
+        tempFriendList.add(new ParentFriendListItem());
+        tempFriendList.add(new ParentFriendListItem());
+
+        tempFriendList.get(0).setGroupViewName("Groups");
+        tempFriendList.get(1).setGroupViewName("Friends");
+
+
+        userRef  = new Firebase("https://jchatapps.firebaseio.com/user");
+        userRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(userCount == 0){
+                    userCount = (int)dataSnapshot.getChildrenCount();
+                }
+                for(DataSnapshot ds : dataSnapshot.getChildren()) {
+                    friendAccountList.put(ds.getKey(), ds.getValue(UserAccount.class));
+                }
+                loadingHandler.setText("event_trigger_u");
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
+
+        friendRef = new Firebase("https://jchatapps.firebaseio.com/friend");
+        friendRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                    Friend f = ds.getValue(Friend.class);
+
+                    if (f.getUserId().equals(userSessionAccount.getUserId())) {
+                        tempFriendList.get(FragmentFriend.FRIEND).getFriendList().add(new FriendListItem());
+                        tempFriendList.get(FragmentFriend.FRIEND).getFriendList().get(
+                                tempFriendList.get(FragmentFriend.FRIEND).getFriendList().size() - 1
+                        ).setFriendIdentity(f);
+                        friendCount++;
+                        //toastMsg(friendAccountList.size()+" " +userSessionAccount.getTotalGroup()+ " " +friendCount + " " +userCount);
+                    }
+                }
+
+                loadingHandler.setText("event_trigger_f");
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
+
+        groupRef = new Firebase("https://jchatapps.firebaseio.com/group");
+        groupRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                    GroupIdentity g = ds.getValue(GroupIdentity.class);
+                    if (g.getUserId().equals(userSessionAccount.getUserId())) {
+                        tempFriendList.get(FragmentFriend.GROUP).getFriendList().add(new FriendListItem());
+                        tempFriendList.get(FragmentFriend.GROUP).getFriendList().get(
+                                tempFriendList.get(FragmentFriend.GROUP).getFriendList().size() - 1
+                        ).setGroupIdentity(g);
+                        groupCount++;
+                    }
+                }
+                loadingHandler.setText("event trigger_g");
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
+
+        loadingHandler.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(userCount!=0 && friendAccountList.size() == userCount
+                        && userSessionAccount.getTotalFriend() == friendCount
+                        && userSessionAccount.getTotalGroup() == groupCount){
+                    selectAllFriend();
+                    setLayout();
+                    ready = true;
+                    Toast.makeText(getApplicationContext(),"Welcome,"+userSessionAccount.getDisplayName(),Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+    }
+
+
+    void selectAllFriend(){
+        for(int i=0; i< tempFriendList.get(FragmentFriend.FRIEND).getFriendList().size(); i++){
+            if(tempFriendList.get(FragmentFriend.FRIEND).getFriendList().get(i).getFriendIdentity().getBlocked() == 0) {
+                tempFriendList.get(FragmentFriend.FRIEND).getFriendList().get(i).setFriendDetail(
+                        friendAccountList.get(
+                                tempFriendList.get(
+                                        FragmentFriend.FRIEND
+                                ).getFriendList().get(i).getFriendIdentity().getFriendId())
+                );
+
+            }
+        }
     }
 
     static Toolbar toolbar;
@@ -79,9 +242,12 @@ public class HomeActivity extends AppCompatActivity
 
 //        Toast.makeText(HomeActivity.this,shrd.getString("userID",null),Toast.LENGTH_LONG).show();
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
-
+        setContentView(R.layout.loading);
         initComponent();
+    }
+
+    void setLayout(){
+        setContentView(R.layout.activity_home);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar); //tes lagi , kemaren2 soalnya null skrg kgk ;__;
         getSupportActionBar().setTitle("Friend");
@@ -128,18 +294,19 @@ public class HomeActivity extends AppCompatActivity
 
         TabLayout tabLayout=(TabLayout) findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);
-
-
-
     }
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
+        if(!ready) {
+            this.finish();
+        }else {
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            if (drawer.isDrawerOpen(GravityCompat.START)) {
+                drawer.closeDrawer(GravityCompat.START);
+            } else {
+                super.onBackPressed();
+            }
         }
     }
 
@@ -177,9 +344,10 @@ public class HomeActivity extends AppCompatActivity
             File f;
             f = new File("/data/data/"+getPackageName()+"/shared_prefs/user_session.xml");
             f.delete();
+            initStatic();
             Intent i = new Intent(getApplicationContext(),MainActivity.class);
             startActivity(i);
-            finish();
+            this.finish();
 
         }
 

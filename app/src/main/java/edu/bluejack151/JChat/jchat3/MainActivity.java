@@ -76,8 +76,6 @@ public class MainActivity extends AppCompatActivity {
 
         f = new File("/data/data/"+getPackageName()+"/shared_prefs/user_session.xml");
 
-
-
         if(f.exists()){
             Intent i = new Intent(getApplicationContext(),HomeActivity.class);
             startActivity(i);
@@ -216,6 +214,7 @@ public class MainActivity extends AppCompatActivity {
         fbButton.registerCallback(callbackManager,
                 new FacebookCallback<LoginResult>() {
                     String idUs;
+
                     @Override
                     public void onSuccess(LoginResult loginResult) {
                         GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
@@ -227,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
                                     //Toast.makeText(getApplicationContext(), jsonObject.getString("id"), Toast.LENGTH_LONG).show();
                                     editor.putString("userID", jsonObject.getString("id").toString());
                                     editor.commit();
-                                   // Toast.makeText(getApplicationContext(), idUs, Toast.LENGTH_LONG).show();
+                                    // Toast.makeText(getApplicationContext(), idUs, Toast.LENGTH_LONG).show();
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -255,6 +254,8 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), "Asu Error", Toast.LENGTH_LONG).show();
                     }
                 });
+
+
 
     }
 

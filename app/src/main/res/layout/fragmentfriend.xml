@@ -1,17 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/com_facebook_button_login_silver_background_color"
 
-    >
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1"
+    android:paddingLeft="@dimen/abc_action_bar_content_inset_material"
+    android:paddingTop="@dimen/abc_action_bar_content_inset_material"
+    android:paddingRight="@dimen/abc_action_bar_content_inset_material"
+    android:paddingBottom="@dimen/abc_action_bar_content_inset_material">
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/fieldSearchFriend"
+        android:layout_gravity="center_horizontal"
+        android:hint="Search here"
+        android:paddingBottom="@dimen/abc_action_bar_content_inset_material"
+        android:singleLine="true" />
 
     <ExpandableListView
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/expandableListView"
-        android:indicatorLeft="250dp"
-        android:indicatorRight="430dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:id="@+id/friendListView"
+        android:layout_gravity="center_horizontal" />
+
 </LinearLayout>
