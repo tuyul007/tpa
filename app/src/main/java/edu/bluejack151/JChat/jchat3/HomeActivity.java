@@ -78,7 +78,7 @@ public class HomeActivity extends AppCompatActivity
 
     public static ArrayList<ParentFriendListItem> tempFriendList;
     public static HashMap<String,UserAccount> friendAccountList;
-    public static Integer friendCount = 0,groupCount = 0,userCount = 0;
+    public static Integer friendCount = 0,groupCount = 0,userCount = 0,totalGroup = 0;
     Boolean ready;
     //BUAT USER SESSION
     SharedPreferences userSessionPreferences;
@@ -104,36 +104,23 @@ public class HomeActivity extends AppCompatActivity
     void initStatic(){
         HomeActivity.tempFriendList = null;
         HomeActivity.friendAccountList = null;
-        HomeActivity.friendCount = 0;HomeActivity.groupCount = 0;HomeActivity.userCount = 0;
+        HomeActivity.friendCount = 0;HomeActivity.groupCount = 0;HomeActivity.userCount = 0;HomeActivity.totalGroup = 0;
 
     }
+    void initDatabase(){
 
-    void initComponent(){
-        userSessionPreferences = getSharedPreferences("user_session", MODE_PRIVATE);
-        userSessionAccount = new Gson().fromJson(userSessionPreferences.getString("user_session", ""), UserAccount.class);
-        loadingHandler = (TextView)findViewById(R.id.loadingHandler);
-        loadingHandler.setText("");
-
-        ready = false;
-
-        tempFriendList = new ArrayList<>();
-        friendAccountList = new HashMap<>();
-
-        tempFriendList.add(new ParentFriendListItem());
-        tempFriendList.add(new ParentFriendListItem());
-
-        tempFriendList.get(0).setGroupViewName("Groups");
-        tempFriendList.get(1).setGroupViewName("Friends");
-
-
+        groupRef = new Firebase("https://jchatapps.firebaseio.com/group");
+        friendRef = new Firebase("https://jchatapps.firebaseio.com/friend");
         userRef  = new Firebase("https://jchatapps.firebaseio.com/user");
+
+
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if(userCount == 0){
-                    userCount = (int)dataSnapshot.getChildrenCount();
+                if (userCount == 0) {
+                    userCount = (int) dataSnapshot.getChildrenCount();
                 }
-                for(DataSnapshot ds : dataSnapshot.getChildren()) {
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
                     friendAccountList.put(ds.getKey(), ds.getValue(UserAccount.class));
                 }
                 loadingHandler.setText("event_trigger_u");
@@ -145,7 +132,7 @@ public class HomeActivity extends AppCompatActivity
             }
         });
 
-        friendRef = new Firebase("https://jchatapps.firebaseio.com/friend");
+
         friendRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -169,8 +156,6 @@ public class HomeActivity extends AppCompatActivity
 
             }
         });
-
-        groupRef = new Firebase("https://jchatapps.firebaseio.com/group");
         groupRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -181,8 +166,9 @@ public class HomeActivity extends AppCompatActivity
                         tempFriendList.get(FragmentFriend.GROUP).getFriendList().get(
                                 tempFriendList.get(FragmentFriend.GROUP).getFriendList().size() - 1
                         ).setGroupIdentity(g);
-                        groupCount++;
+                        if(g.getAccept()==1)groupCount++;
                     }
+                    totalGroup++;
                 }
                 loadingHandler.setText("event trigger_g");
             }
@@ -192,7 +178,26 @@ public class HomeActivity extends AppCompatActivity
 
             }
         });
+    }
+    void initComponent(){
+        userSessionPreferences = getSharedPreferences("user_session", MODE_PRIVATE);
+        userSessionAccount = new Gson().fromJson(userSessionPreferences.getString("user_session", ""), UserAccount.class);
+        loadingHandler = (TextView)findViewById(R.id.loadingHandler);
+        loadingHandler.setText("");
 
+        ready = false;
+
+        tempFriendList = new ArrayList<>();
+        friendAccountList = new HashMap<>();
+
+        tempFriendList.add(new ParentFriendListItem());
+        tempFriendList.add(new ParentFriendListItem());
+
+        tempFriendList.get(0).setGroupViewName("Groups");
+        tempFriendList.get(1).setGroupViewName("Friends");
+
+
+        initDatabase();
         loadingHandler.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -206,20 +211,19 @@ public class HomeActivity extends AppCompatActivity
 
             @Override
             public void afterTextChanged(Editable s) {
-                if(userCount!=0 && friendAccountList.size() == userCount
+                if (userCount != 0 && friendAccountList.size() == userCount
                         && userSessionAccount.getTotalFriend() == friendCount
-                        && userSessionAccount.getTotalGroup() == groupCount){
+                        && userSessionAccount.getTotalGroup() == groupCount) {
                     selectAllFriend();
+                    checkUpdates();
                     setLayout();
                     ready = true;
-                    Toast.makeText(getApplicationContext(),"Welcome,"+userSessionAccount.getDisplayName(),Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Welcome," + userSessionAccount.getDisplayName(), Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
     }
-
-
     void selectAllFriend(){
         for(int i=0; i< tempFriendList.get(FragmentFriend.FRIEND).getFriendList().size(); i++){
                 tempFriendList.get(FragmentFriend.FRIEND).getFriendList().get(i).setFriendDetail(
@@ -229,6 +233,47 @@ public class HomeActivity extends AppCompatActivity
                                 ).getFriendList().get(i).getFriendIdentity().getFriendId())
                 );
         }
+    }
+
+    void checkUpdates(){
+        groupRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(totalGroup < dataSnapshot.getChildrenCount()) {
+                    GroupIdentity g = null;
+                    for (DataSnapshot ds : dataSnapshot.getChildren()) g = ds.getValue(GroupIdentity.class);
+                    if (g.getUserId().equals(HomeActivity.userSessionAccount.getUserId())) {
+                        HomeActivity.tempFriendList.get(FragmentFriend.GROUP).getFriendList().add(new FriendListItem());
+                        HomeActivity.tempFriendList.get(FragmentFriend.GROUP).getFriendList().get(
+                                HomeActivity.tempFriendList.get(FragmentFriend.GROUP).getFriendList().size() - 1
+                        ).setGroupIdentity(g);
+
+                        FragmentFriend.adapter.setFriendAndGroupList(tempFriendList);
+                        FragmentFriend.adapter.notifyDataSetChanged();
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
+        userRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                if(friendAccountList.get(dataSnapshot.getKey()) == null )
+                    friendAccountList.put(dataSnapshot.getKey(),dataSnapshot.getValue(UserAccount.class));
+            }
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {}
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {}
+        });
     }
 
     static Toolbar toolbar;
@@ -301,7 +346,8 @@ public class HomeActivity extends AppCompatActivity
             if (drawer.isDrawerOpen(GravityCompat.START)) {
                 drawer.closeDrawer(GravityCompat.START);
             } else {
-                super.onBackPressed();
+                initStatic();
+                this.finish();
             }
         }
     }

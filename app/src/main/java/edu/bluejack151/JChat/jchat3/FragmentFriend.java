@@ -19,10 +19,12 @@ import android.widget.ExpandableListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
+import com.google.gson.Gson;
 import com.shiperus.ark.jchat3.R;
 
 import java.util.ArrayList;
@@ -42,11 +44,11 @@ public class FragmentFriend  extends android.support.v4.app.Fragment{
     final static Integer GROUP = 0;
     public static ExpandableListView elv;
 
-    Firebase friendRef,groupRef;
+    Firebase friendRef,groupRef,userRef;
 
     EditText fieldSearchFriend;
     ArrayList<ParentFriendListItem>listGroupAndFriend;
-    SavedTabsListAdapter adapter;
+    public static SavedTabsListAdapter adapter;
 
     GroupIdentity groupTarget;
     Friend friendIdentityTarget;
@@ -55,7 +57,7 @@ public class FragmentFriend  extends android.support.v4.app.Fragment{
 
 
     Dialog dialog;
-    Button popUpMenu1,popUpMenu2,popUpMenu3,popUpMenu4;
+    Button popUpMenu1,popUpMenu2;
 
     String search = "";
     public String toLower(String word){
@@ -65,6 +67,13 @@ public class FragmentFriend  extends android.support.v4.app.Fragment{
         }
 
         return newWord;
+    }
+
+    void setSession(){
+        SharedPreferences.Editor userSessionEditor = getActivity().getSharedPreferences("user_session",Context.MODE_PRIVATE).edit();
+        String usersession = new Gson().toJson(HomeActivity.userSessionAccount);
+        userSessionEditor.putString("user_session", usersession);
+        userSessionEditor.commit();
     }
 
     void toastMsg(String msg){
@@ -79,6 +88,7 @@ public class FragmentFriend  extends android.support.v4.app.Fragment{
     }
 
     void initFirebase(){
+        userRef = new Firebase("https://jchatapps.firebaseio.com/user");
         friendRef = new Firebase("https://jchatapps.firebaseio.com/friend");
         groupRef = new Firebase("https://jchatapps.firebaseio.com/group");
 
@@ -116,7 +126,7 @@ public class FragmentFriend  extends android.support.v4.app.Fragment{
         View view=inflater.inflate(R.layout.fragmentfriend,container,false);
         elv = (ExpandableListView) view.findViewById(R.id.friendListView);
         fieldSearchFriend = (EditText)view.findViewById(R.id.fieldSearchFriend);
-        listGroupAndFriend =  HomeActivity.tempFriendList;
+        listGroupAndFriend = (ArrayList<ParentFriendListItem>) HomeActivity.tempFriendList.clone();
         adapter = new SavedTabsListAdapter(getActivity(), listGroupAndFriend);
         initModalDialog();
         initFirebase();
@@ -167,21 +177,12 @@ public class FragmentFriend  extends android.support.v4.app.Fragment{
         if(group == GROUP){
             dialog.setTitle(fl.getGroupIdentity().getGroupName());
             popUpMenu1.setText("Chat");
-            popUpMenu2.setVisibility(View.GONE);
+            popUpMenu2.setText("Leave Group");
             if(fl.getGroupIdentity().getAccept() == 0){
                 popUpMenu1.setText("Accept");
                 popUpMenu2.setText("Decline");
                 popUpMenu2.setVisibility(View.VISIBLE);
-                popUpMenu2.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        listGroupAndFriend.get(group).getFriendList().remove(child);
-                        groupRef.child(fl.getGroupIdentity().getGroupId() + "_" +
-                                fl.getGroupIdentity().getUserId()).removeValue();
-                        adapter.notifyDataSetChanged();
-                        dialog.dismiss();
-                    }
-                });
+
             }
             popUpMenu1.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -190,12 +191,35 @@ public class FragmentFriend  extends android.support.v4.app.Fragment{
                         fl.getGroupIdentity().setAccept(1);
                         groupRef.child(fl.getGroupIdentity().getGroupId() + "_" +
                                 fl.getGroupIdentity().getUserId()).setValue(fl.getGroupIdentity());
+
+                        HomeActivity.userSessionAccount.setTotalGroup((HomeActivity.userSessionAccount.getTotalGroup()+1));
+                        userRef.child(HomeActivity.userSessionAccount.getUserId()).setValue(HomeActivity.userSessionAccount);
+                        setSession();
+
                         adapter.notifyDataSetChanged();
                         dialog.dismiss();
                     } else {
                         //chat
                         toastMsg("group chat");
                     }
+                }
+            });
+            popUpMenu2.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listGroupAndFriend.get(group).getFriendList().remove(child);
+                    groupRef.child(fl.getGroupIdentity().getGroupId() + "_" +
+                            fl.getGroupIdentity().getUserId()).removeValue();
+
+                    if(popUpMenu2.getText().equals("Leave Group")){
+                        HomeActivity.userSessionAccount.setTotalGroup((HomeActivity.userSessionAccount.getTotalGroup()-1));
+                        userRef.child(HomeActivity.userSessionAccount.getUserId()).setValue(HomeActivity.userSessionAccount);
+                        HomeActivity.totalGroup--;
+                        setSession();
+                    }
+
+                    adapter.notifyDataSetChanged();
+                    dialog.dismiss();
                 }
             });
         }else{

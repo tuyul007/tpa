@@ -75,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
         userAccounts = new HashMap<>();
 
         f = new File("/data/data/"+getPackageName()+"/shared_prefs/user_session.xml");
-
         if(f.exists()){
             Intent i = new Intent(getApplicationContext(),HomeActivity.class);
             startActivity(i);
