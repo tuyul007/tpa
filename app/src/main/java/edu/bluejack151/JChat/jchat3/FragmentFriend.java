@@ -16,6 +16,7 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,6 +45,8 @@ public class FragmentFriend  extends android.support.v4.app.Fragment{
     final static Integer GROUP = 0;
     public static ExpandableListView elv;
 
+
+    ImageButton searchContact;
     Firebase friendRef,groupRef,userRef;
 
     EditText fieldSearchFriend;
@@ -125,13 +128,23 @@ public class FragmentFriend  extends android.support.v4.app.Fragment{
     {
         View view=inflater.inflate(R.layout.fragmentfriend,container,false);
         elv = (ExpandableListView) view.findViewById(R.id.friendListView);
-        fieldSearchFriend = (EditText)view.findViewById(R.id.fieldSearchFriend);
+        fieldSearchFriend = (EditText)view.findViewById(R.id.inputContactName);
         listGroupAndFriend = (ArrayList<ParentFriendListItem>) HomeActivity.tempFriendList.clone();
         adapter = new SavedTabsListAdapter(getActivity(), listGroupAndFriend);
         initModalDialog();
         initFirebase();
         elv.setAdapter(adapter);
 
+//        HomeActivity.showMenuItem();
+
+//        searchContact=(ImageButton)view.findViewById(R.id.searchContactButton);
+//
+//        searchContact.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Toast.makeText(getActivity(), "Cari Teman EHHHH", Toast.LENGTH_SHORT).show();
+//            }
+//        });
 
         fieldSearchFriend.addTextChangedListener(new TextWatcher() {
             @Override

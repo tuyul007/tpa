@@ -1,6 +1,7 @@
 package edu.bluejack151.JChat.jchat3;
 
 import android.app.ProgressDialog;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,6 +16,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.view.menu.ActionMenuItem;
+import android.support.v7.view.menu.ActionMenuItemView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.Time;
@@ -312,16 +315,27 @@ public class HomeActivity extends AppCompatActivity
 
             @Override
             public void onPageSelected(int position) {
+
+
+
+
                 switch(position) {
                     case 0:
 
+
+
                         getSupportActionBar().setTitle("Friend");
+                        showMenuItem();
+
                         break;
                     case 1:
                         getSupportActionBar().setTitle("Chat");
+                        hideMenuItem();
                         break;
                     case 2:
                         getSupportActionBar().setTitle("Profile");
+                        hideMenuItem();
+
                         break;
 
                 }
@@ -352,11 +366,32 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
+    static Menu mn;
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.home, menu);
+
+        mn=menu;
+
+
         return true;
+    }
+
+    public static void hideMenuItem()
+    {
+        mn.findItem(R.id.action_settings).setVisible(false);
+    }
+
+    public static void showMenuItem()
+    {
+        mn.findItem(R.id.action_settings).setVisible(true);
+    }
+
+    public void wew()
+    {
+
     }
 
     @Override
@@ -368,6 +403,9 @@ public class HomeActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent i = new Intent(getApplicationContext(),AddFriend.class);
+            startActivity(i);
+
             return true;
         }
 
@@ -381,7 +419,9 @@ public class HomeActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_account_setting) {
-            // Handle the camera action
+            Intent i = new Intent(getApplicationContext(),AccountSetting.class);
+            startActivity(i);
+
         } else if (id == R.id.nav_logout) {
             File f;
             f = new File("/data/data/"+getPackageName()+"/shared_prefs/user_session.xml");

@@ -130,7 +130,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         editor = getSharedPreferences(preferencesName, MODE_PRIVATE).edit();
-
+//        this.setTitle("EHM"); ->ganti title
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true); ->munculin back button di title
         initComponent();
 
         userRef = new Firebase("https://jchatapps.firebaseio.com/user");

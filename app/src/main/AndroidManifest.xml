@@ -32,6 +32,9 @@
             android:name="edu.bluejack151.JChat.jchat3.HomeActivity"
             android:label="@string/title_activity_home"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name="edu.bluejack151.JChat.jchat3.AccountSetting" />
+
+        <activity android:name="edu.bluejack151.JChat.jchat3.AddFriend"></activity>
     </application>
 
 </manifest>

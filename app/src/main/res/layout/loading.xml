@@ -2,26 +2,40 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:alpha="0.3"
+    android:alpha="0.8"
     android:background="#000000"
     android:gravity="center_vertical"
     android:weightSum="1">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Small Text"
+        android:text="Loading"
+        android:textColor="#ffffff"
         android:id="@+id/loadingHandler"
-        android:visibility="visible" />
+        android:gravity="center"
+        android:visibility="invisible"
+        android:textSize="25dp" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Loading"
+        android:textColor="#ffffff"
+        android:id="@+id/loadText"
+        android:gravity="center"
+        android:visibility="visible"
+        android:textSize="25dp" />
 
     <ProgressBar
         android:layout_width="103dp"
         android:layout_height="104dp"
         android:id="@+id/loadingProgressBar"
         android:layout_gravity="center_horizontal"
-        android:background="#000000"
+
         android:max="100"
-        android:indeterminate="false"
-        android:alpha="0.3" />
+
+        android:indeterminate="true"
+        android:alpha="0.9" />
 </LinearLayout>

@@ -23,6 +23,7 @@ public class FragmentProfile extends android.support.v4.app.Fragment{
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstance)
     {
         View view=inflater.inflate(R.layout.fragmentprofile,container,false);
+//        HomeActivity.hideMenuItem();
         return  view;
     }
 }
