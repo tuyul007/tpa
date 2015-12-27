@@ -222,7 +222,7 @@ public class FragmentFriend  extends android.support.v4.app.Fragment{
                 public void onClick(View v) {
                     listGroupAndFriend.get(group).getFriendList().remove(child);
                     groupRef.child(fl.getGroupIdentity().getGroupId() + "_" +
-                            fl.getGroupIdentity().getUserId()).removeValue();
+                            fl.getGroupIdentity() .getUserId()).removeValue();
 
                     if(popUpMenu2.getText().equals("Leave Group")){
                         HomeActivity.userSessionAccount.setTotalGroup((HomeActivity.userSessionAccount.getTotalGroup() - 1));
