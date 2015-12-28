@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="60dp"
-    android:minHeight="60dp"
+    android:layout_height="30dp"
+    android:minHeight="30dp"
     >
 
     <RelativeLayout
         android:descendantFocusability="blocksDescendants"
         android:orientation="vertical"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:minHeight="30dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentLeft="true"
@@ -18,9 +19,9 @@
         <ImageView
             android:layout_width="60dp"
             android:gravity="center"
-            android:layout_height="60dp"
+            android:layout_height="match_parent"
             android:src="@drawable/com_facebook_profile_picture_blank_square"
-            android:id="@+id/profileSearchPicture"
+            android:id="@+id/profileGroupInvitePictureDialog"
             android:layout_alignParentBottom="true" />
 
         <TextView
@@ -31,22 +32,22 @@
             android:text="John"
             android:textSize="22dp"
             android:textStyle="bold"
-            android:id="@+id/friendNameSearch"
+            android:id="@+id/groupInviteDialogName"
             android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@+id/btnAdd"
-            android:layout_alignBottom="@+id/btnAdd"
-            android:layout_toRightOf="@+id/profileSearchPicture"
-            android:layout_toEndOf="@+id/profileSearchPicture" />
+            android:layout_toLeftOf="@+id/checkBoxInviteFriendDialog"
+            android:layout_toRightOf="@+id/profileGroupInvitePictureDialog"
+            android:layout_toEndOf="@+id/profileGroupInvitePictureDialog" />
 
-        <ImageButton
+        <CheckBox
+            android:focusable="false"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/btnAdd"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:src="@drawable/ic_addfriend_icon"
+            android:layout_height="match_parent"
+            android:id="@+id/checkBoxInviteFriendDialog"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentTop="true" />
+            android:checked="false"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
 
 
     </RelativeLayout>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:minWidth="200dp"
+    android:weightSum="1"
+    android:orientation="vertical">
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="161dp"
+        android:id="@+id/listDialogInviteFriend" />
+
+    <Button
+        android:layout_marginTop="20dp"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="113dp"
+        android:layout_height="wrap_content"
+        android:text="Invite"
+        android:id="@+id/buttonConfirmInviteDialog"
+        android:layout_gravity="center_horizontal"
+        android:onClick="invitePeople"
+        />
+
+</LinearLayout>

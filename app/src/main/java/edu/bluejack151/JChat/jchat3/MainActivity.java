@@ -1,5 +1,6 @@
 package edu.bluejack151.JChat.jchat3;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -46,7 +48,7 @@ import java.util.Map;
 import edu.bluejack151.JChat.jchat3.Helper.UserAccount;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     SharedPreferences loginPreferences;
     File f;
@@ -126,11 +128,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Firebase.setAndroidContext(this);
         FacebookSdk.sdkInitialize(getApplicationContext());
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
-
         editor = getSharedPreferences(preferencesName, MODE_PRIVATE).edit();
 //        this.setTitle("EHM"); ->ganti title
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(true); ->munculin back button di title
+
+
         initComponent();
 
         userRef = new Firebase("https://jchatapps.firebaseio.com/user");

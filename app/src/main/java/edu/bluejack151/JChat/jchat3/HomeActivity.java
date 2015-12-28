@@ -362,6 +362,10 @@ public class HomeActivity extends AppCompatActivity
 //        Toast.makeText(HomeActivity.this,shrd.getString("userID",null),Toast.LENGTH_LONG).show();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.loading);
+
+
+
+
         initComponent();
     }
 
@@ -451,11 +455,14 @@ public class HomeActivity extends AppCompatActivity
     public static void hideMenuItem()
     {
         mn.findItem(R.id.action_settings).setVisible(false);
+        mn.findItem(R.id.action_settings_create_group).setVisible(false);
     }
 
     public static void showMenuItem()
     {
         mn.findItem(R.id.action_settings).setVisible(true);
+        mn.findItem(R.id.action_settings_create_group).setVisible(true);
+
     }
 
     public void wew()
@@ -472,6 +479,12 @@ public class HomeActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             Intent i = new Intent(getApplicationContext(),AddFriend.class);
+            startActivity(i);
+
+            return true;
+        }
+        else if (id == R.id.action_settings_create_group) {
+            Intent i = new Intent(getApplicationContext(),CreateGroup.class);
             startActivity(i);
 
             return true;
