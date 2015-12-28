@@ -73,7 +73,7 @@ public class ChatListAdapter extends ArrayAdapter{
             //private chat
             txtFromName.setText(getUserAccount(position).getDisplayName());
             if(!getProfilePicture(position).equals("")){
-                //ganti profile picture
+                //ganti profile pictures
             }
         }else{
             //groupchat
