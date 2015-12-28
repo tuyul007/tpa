@@ -135,17 +135,6 @@ public class FragmentFriend  extends android.support.v4.app.Fragment{
         initFirebase();
         elv.setAdapter(adapter);
 
-//        HomeActivity.showMenuItem();
-
-//        searchContact=(ImageButton)view.findViewById(R.id.searchContactButton);
-//
-//        searchContact.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Toast.makeText(getActivity(), "Cari Teman EHHHH", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-
         fieldSearchFriend.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {

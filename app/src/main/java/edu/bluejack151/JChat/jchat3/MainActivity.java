@@ -93,7 +93,6 @@ public class MainActivity extends AppCompatActivity {
         AppEventsLogger.activateApp(this);
     }
 
-
     @Override
     protected void onPause() {
         super.onPause();

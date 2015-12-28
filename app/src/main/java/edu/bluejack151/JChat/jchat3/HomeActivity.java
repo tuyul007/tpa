@@ -1,29 +1,16 @@
 package edu.bluejack151.JChat.jchat3;
 
 import android.app.ProgressDialog;
-import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.view.menu.ActionMenuItem;
-import android.support.v7.view.menu.ActionMenuItemView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.text.format.Time;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -32,9 +19,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,23 +27,21 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
-import com.firebase.client.snapshot.IndexedNode;
 import com.google.gson.Gson;
 import com.shiperus.ark.jchat3.R;
 
 import java.io.File;
-import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.support.design.widget.TabLayout;
 
-import org.w3c.dom.Node;
-
+import edu.bluejack151.JChat.jchat3.AdapterHelper.ChatAdapterItem;
 import edu.bluejack151.JChat.jchat3.AdapterHelper.FriendListItem;
+import edu.bluejack151.JChat.jchat3.AdapterHelper.GroupNotif;
 import edu.bluejack151.JChat.jchat3.AdapterHelper.ParentFriendListItem;
+import edu.bluejack151.JChat.jchat3.Helper.Chat;
 import edu.bluejack151.JChat.jchat3.Helper.Friend;
 import edu.bluejack151.JChat.jchat3.Helper.GroupIdentity;
 import edu.bluejack151.JChat.jchat3.Helper.UserAccount;
@@ -72,17 +54,17 @@ public class HomeActivity extends AppCompatActivity
     }
 
     SharedPreferences shrd;
-    Firebase friendRef;
-    Firebase userRef;
-    Firebase groupRef;
+    Firebase friendRef,userRef,groupRef,chatRef,groupNotifRef;
     ProgressDialog progressDialog;
     Handler handler;
     TextView loadingHandler;
 
     public static ArrayList<ParentFriendListItem> tempFriendList;
+    public static HashMap<String,ChatAdapterItem> chatList;
     public static HashMap<String,UserAccount> friendAccountList;
     public static Integer friendCount = 0,groupCount = 0,userCount = 0,totalGroup = 0;
     Boolean ready;
+
     //BUAT USER SESSION
     SharedPreferences userSessionPreferences;
     public static UserAccount userSessionAccount;
@@ -107,6 +89,7 @@ public class HomeActivity extends AppCompatActivity
     void initStatic(){
         HomeActivity.tempFriendList = null;
         HomeActivity.friendAccountList = null;
+        HomeActivity.chatList = null;
         HomeActivity.friendCount = 0;HomeActivity.groupCount = 0;HomeActivity.userCount = 0;HomeActivity.totalGroup = 0;
 
     }
@@ -115,7 +98,9 @@ public class HomeActivity extends AppCompatActivity
         groupRef = new Firebase("https://jchatapps.firebaseio.com/group");
         friendRef = new Firebase("https://jchatapps.firebaseio.com/friend");
         userRef  = new Firebase("https://jchatapps.firebaseio.com/user");
-
+        chatRef = new Firebase("https://jchatapps.firebaseio.com/chat");
+        groupNotifRef = new Firebase("https://jchatapps.firebaseio.com/groupnotif");
+        updateChatHistory();
 
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -134,8 +119,6 @@ public class HomeActivity extends AppCompatActivity
 
             }
         });
-
-
         friendRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -169,11 +152,103 @@ public class HomeActivity extends AppCompatActivity
                         tempFriendList.get(FragmentFriend.GROUP).getFriendList().get(
                                 tempFriendList.get(FragmentFriend.GROUP).getFriendList().size() - 1
                         ).setGroupIdentity(g);
-                        if(g.getAccept()==1)groupCount++;
+                        if (g.getAccept() == 1) groupCount++;
                     }
                     totalGroup++;
                 }
                 loadingHandler.setText("event trigger_g");
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
+    }
+    void updateChatHistory(){
+        chatRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                final Chat c = dataSnapshot.getValue(Chat.class);
+                if(!c.getGroupId().equals("")){
+                    groupRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            if(chatList.get(c.getGroupId()) == null &&
+                                    dataSnapshot.hasChild(c.getGroupId()+"_"+userSessionAccount.getUserId())){
+                                toastMsg("group_msk");
+                                final ChatAdapterItem cai = new ChatAdapterItem();
+                                cai.setLastChat(c);
+                                cai.setGroup(dataSnapshot.child(c.getGroupId()+"_"+userSessionAccount.getUserId()).getValue(GroupIdentity.class));
+                                groupNotifRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        if(dataSnapshot.getChildrenCount() != 0) {
+                                            for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                                                GroupNotif gn = ds.getValue(GroupNotif.class);
+                                                if (gn.getGroupId().equals(cai.getGroup()) && gn.getUserId().equals(userSessionAccount.getUserId()))
+                                                    cai.setNotifCount(cai.getNotifCount() + 1);
+                                            }
+                                        }
+
+                                        chatList.put(c.getGroupId(), cai);
+                                        FragmentChat.updateView();
+                                    }
+
+                                    @Override
+                                    public void onCancelled(FirebaseError firebaseError) {
+
+                                    }
+                                });
+                            }else if(dataSnapshot.hasChild(c.getGroupId()+"_"+userSessionAccount.getUserId())){
+                                chatList.get(c.getGroupId()).setLastChat(c);
+                                FragmentChat.updateView();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(FirebaseError firebaseError) {
+
+                        }
+                    });
+                }else{
+                    if(c.getToId().equals(userSessionAccount.getUserId())){
+                        if(chatList.get(c.getFromId()) == null) {
+                            chatList.put(c.getFromId(),new ChatAdapterItem());
+                        }
+                        chatList.get(c.getFromId()).setLastChat(c);
+                        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                chatList.get(c.getFromId()).setUser(dataSnapshot.child(c.getFromId()).getValue(UserAccount.class));
+                                if (c.getPrivateStatus() == 0)
+                                    chatList.get(c.getFromId()).setNotifCount(chatList.get(c.getFromId()).getNotifCount() + 1);
+                                FragmentChat.updateView();
+                            }
+
+                            @Override
+                            public void onCancelled(FirebaseError firebaseError) {
+
+                            }
+                        });
+                    }
+
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
             }
 
             @Override
@@ -187,10 +262,10 @@ public class HomeActivity extends AppCompatActivity
         userSessionAccount = new Gson().fromJson(userSessionPreferences.getString("user_session", ""), UserAccount.class);
         loadingHandler = (TextView)findViewById(R.id.loadingHandler);
         loadingHandler.setText("");
-
         ready = false;
 
         tempFriendList = new ArrayList<>();
+        chatList = new HashMap<>();
         friendAccountList = new HashMap<>();
 
         tempFriendList.add(new ParentFriendListItem());
@@ -216,7 +291,8 @@ public class HomeActivity extends AppCompatActivity
             public void afterTextChanged(Editable s) {
                 if (userCount != 0 && friendAccountList.size() == userCount
                         && userSessionAccount.getTotalFriend() == friendCount
-                        && userSessionAccount.getTotalGroup() == groupCount) {
+                        && userSessionAccount.getTotalGroup() == groupCount
+                        ) {
                     selectAllFriend();
                     checkUpdates();
                     setLayout();
@@ -237,7 +313,6 @@ public class HomeActivity extends AppCompatActivity
                 );
         }
     }
-
     void checkUpdates(){
         groupRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -316,14 +391,8 @@ public class HomeActivity extends AppCompatActivity
             @Override
             public void onPageSelected(int position) {
 
-
-
-
                 switch(position) {
                     case 0:
-
-
-
                         getSupportActionBar().setTitle("Friend");
                         showMenuItem();
 
@@ -391,7 +460,6 @@ public class HomeActivity extends AppCompatActivity
 
     public void wew()
     {
-
     }
 
     @Override

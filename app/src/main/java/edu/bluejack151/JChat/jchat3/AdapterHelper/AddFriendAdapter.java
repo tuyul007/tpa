@@ -1,4 +1,4 @@
-package edu.bluejack151.JChat.jchat3;
+package edu.bluejack151.JChat.jchat3.AdapterHelper;
 
 import android.app.Activity;
 import android.view.LayoutInflater;
@@ -28,7 +28,7 @@ public class AddFriendAdapter  extends ArrayAdapter<String> {
         this.searchFriendName=searchFriendName;
         this.imgSearchFriend=imgSearchFriend;
     }
-
+    @Override
     public View getView(int position,View view,ViewGroup parent) {
         LayoutInflater inflater=context.getLayoutInflater();
         View rowView=inflater.inflate(R.layout.list_search_add_friend, null, true);
