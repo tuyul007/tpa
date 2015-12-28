@@ -21,7 +21,7 @@ public class AddFriendAdapter  extends ArrayAdapter<String> {
     private ArrayList<String> searchFriendName=new ArrayList<String>();
     private  ArrayList<Integer> imgSearchFriend=new ArrayList<>();
     public AddFriendAdapter(Activity context,ArrayList<String> searchFriendName,ArrayList<Integer> imgSearchFriend) {
-        super(context, R.layout.list_chat, searchFriendName);
+        super(context, R.layout.list_search_add_friend, searchFriendName);
 
         this.context=context;
 

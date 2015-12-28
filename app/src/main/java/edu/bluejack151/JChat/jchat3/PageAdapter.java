@@ -51,7 +51,7 @@ public class PageAdapter extends FragmentStatePagerAdapter {
         return mNumOfTabs;
     }
 
-    private int[] imagesHeaderTab={R.drawable.ic_friend_icon,R.drawable.ic_chat_icon,R.drawable.ic_friend_icon};
+    private int[] imagesHeaderTab={R.drawable.ic_friend_icon2,R.drawable.ic_chat_icon,R.drawable.ic_friend_icon};
     private String tabTitles[] = new String[] { "Friend", "Chat","Profile" };
     @Override
     public CharSequence getPageTitle(int position) {
