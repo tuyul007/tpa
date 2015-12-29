@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="edu.bluejack151.JChat.jchat3.GambarDafuq">
+
+    <ImageView
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:id="@+id/imgTesUpload"
+
+        android:minWidth="300dp"
+        android:minHeight="300dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/com_facebook_profile_picture_blank_portrait"
+        />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Choose"
+        android:id="@+id/chooseImageButton"
+        android:layout_below="@+id/imgTesUpload"
+        android:layout_alignRight="@+id/imgTesUpload"
+        android:layout_alignEnd="@+id/imgTesUpload"
+        android:layout_alignLeft="@+id/imgTesUpload"
+        android:layout_alignStart="@+id/imgTesUpload" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Upload"
+        android:id="@+id/uploadImageButton"
+        android:layout_alignParentBottom="true"
+        android:layout_alignLeft="@+id/chooseImageButton"
+        android:layout_alignStart="@+id/chooseImageButton"
+        android:layout_alignRight="@+id/chooseImageButton"
+        android:layout_alignEnd="@+id/chooseImageButton" />
+</RelativeLayout>

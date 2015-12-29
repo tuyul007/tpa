@@ -35,14 +35,14 @@ public class DialogGroupInviteAdapter extends ArrayAdapter<String> {
         LayoutInflater inflater=context.getLayoutInflater();
         View rowView=inflater.inflate(R.layout.group_friend_invite_modal_list_friend, null, true);
 
-        final CheckBox chk=(CheckBox)rowView.findViewById(R.id.checkBoxInviteFriendDialog);
-        chk.setTag(position);
-        chk.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(context, chk.getTag().toString(), Toast.LENGTH_SHORT).show();
-            }
-        });
+//        final CheckBox chk=(CheckBox)rowView.findViewById(R.id.checkBoxInviteFriendDialog);
+//        chk.setTag(position);
+//        chk.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Toast.makeText(context, chk.getTag().toString(), Toast.LENGTH_SHORT).show();
+//            }
+//        });
 
         TextView txtNameInviteGroupDialog = (TextView) rowView.findViewById(R.id.groupInviteDialogName);
 

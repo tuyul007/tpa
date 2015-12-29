@@ -4,11 +4,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -120,7 +123,7 @@ public class MainActivity extends Activity {
         }
         return false;
     }
-
+    Firebase uploadedImageTesRef;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -130,7 +133,15 @@ public class MainActivity extends Activity {
         FacebookSdk.sdkInitialize(getApplicationContext());
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
+
+        //                    Intent i = new Intent(getApplicationContext(),HomeActivity.class);
+
+//        Intent toGambar=new Intent(getApplicationContext(),GambarDafuq.class);
+
+//        startActivity(toGambar);
+
         editor = getSharedPreferences(preferencesName, MODE_PRIVATE).edit();
+
 //        this.setTitle("EHM"); ->ganti title
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(true); ->munculin back button di title
 
@@ -179,6 +190,8 @@ public class MainActivity extends Activity {
         });
 
         //manual-login
+
+
 
         manualLoginButton.setOnClickListener(new View.OnClickListener() {
             @Override

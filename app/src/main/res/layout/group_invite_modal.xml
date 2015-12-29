@@ -6,20 +6,35 @@
     android:weightSum="1"
     android:orientation="vertical">
 
-    <ListView
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="161dp"
-        android:id="@+id/listDialogInviteFriend" />
+        android:layout_height="213dp">
 
-    <Button
-        android:layout_marginTop="20dp"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="113dp"
-        android:layout_height="wrap_content"
-        android:text="Invite"
-        android:id="@+id/buttonConfirmInviteDialog"
-        android:layout_gravity="center_horizontal"
-        android:onClick="invitePeople"
-        />
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="161dp"
+            android:id="@+id/listDialogInviteFriend"
 
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="113dp"
+            android:layout_height="wrap_content"
+            android:text="Invite"
+            android:id="@+id/button6"
+            android:layout_gravity="center_horizontal"
+            android:onClick="invitePeople"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" />
+
+
+    </RelativeLayout>
 </LinearLayout>

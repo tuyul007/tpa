@@ -9,7 +9,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.CheckedTextView;
 import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.PopupMenu;
@@ -22,7 +24,8 @@ import java.util.ArrayList;
 public class CreateGroup extends AppCompatActivity {
 
     Dialog dialog;
-
+    ArrayAdapter<String> adapter;
+    ListView listView2;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,7 +34,12 @@ public class CreateGroup extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         initModalDialog();
 
-
+//        String[] sports = {"asu","asu2","asu3","benTAI","RickyTai"};
+//        listView2=(ListView)
+//        adapter = new ArrayAdapter<String>(this,
+//                android.R.layout.simple_list_item_multiple_choice, sports);
+//        listView2.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+//        listView2.setAdapter(adapter);
 
 
     }
@@ -81,8 +89,14 @@ public class CreateGroup extends AppCompatActivity {
         DialogGroupInviteAdapter dialogInviteAdapter=new DialogGroupInviteAdapter(this,listSearchName,listSearchImageProfile);
 
          lv= (ListView)dialog.findViewById(R.id.listDialogInviteFriend);
+        lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         lv.setAdapter(dialogInviteAdapter);
-
+//        String[] sports = {"asu","asu2","asu3","benTAI","RickyTai"};
+//        listView2=(ListView) findViewById(R.id.listDialogInviteFriend);
+//        adapter = new ArrayAdapter<String>(this,
+//                android.R.layout.simple_list_item_multiple_choice, sports);
+//        listView2.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+//        listView2.setAdapter(adapter);
 
 
         AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener() {
@@ -90,21 +104,21 @@ public class CreateGroup extends AppCompatActivity {
             public void onItemClick(AdapterView<?> arg0, View arg1, int position, long id) {
                 // AdapterView is the parent class of ListView
                 ListView lv1 = (ListView) arg0;
-                CheckBox chk=(CheckBox)lv1.getChildAt(position).findViewById(R.id.checkBoxInviteFriendDialog);
-                chk.setChecked(true);
+                CheckedTextView chkTxtView=(CheckedTextView)lv1.getChildAt(position).findViewById(R.id.chkInviteFriend);
+                chkTxtView.setChecked(!chkTxtView.isChecked());
 
-                chk.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Toast.makeText(getBaseContext(), "Click Ehhh", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                if(lv1.isItemChecked(position)){
-                    Toast.makeText(getBaseContext(), "You checked " + position, Toast.LENGTH_SHORT).show();
-                }else{
-                    lv1.setItemChecked(position,true);
-                    Toast.makeText(getBaseContext(), "You unchecked " + position, Toast.LENGTH_SHORT).show();
-                }
+//                chk.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        Toast.makeText(getBaseContext(), "Click Ehhh", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+//                if(lv1.isItemChecked(position)){
+//                    Toast.makeText(getBaseContext(), "You checked " + position, Toast.LENGTH_SHORT).show();
+//                }else{
+//                    lv1.setItemChecked(position,true);
+//                    Toast.makeText(getBaseContext(), "You unchecked " + position, Toast.LENGTH_SHORT).show();
+//                }
             }
         };
 

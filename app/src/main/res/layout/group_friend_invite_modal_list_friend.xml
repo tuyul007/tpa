@@ -34,20 +34,21 @@
             android:textStyle="bold"
             android:id="@+id/groupInviteDialogName"
             android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@+id/checkBoxInviteFriendDialog"
             android:layout_toRightOf="@+id/profileGroupInvitePictureDialog"
             android:layout_toEndOf="@+id/profileGroupInvitePictureDialog" />
 
-        <CheckBox
-            android:focusable="false"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:id="@+id/checkBoxInviteFriendDialog"
-            android:layout_alignParentBottom="true"
-            android:checked="false"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true" />
+        <CheckedTextView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/chkInviteFriend"
+            android:layout_width="fill_parent"
+
+            android:layout_height="?android:attr/listPreferredItemHeight"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:gravity="center_vertical"
+            android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+            android:paddingLeft="6dip"
+            android:paddingRight="6dip"
+
+            />
 
 
     </RelativeLayout>
