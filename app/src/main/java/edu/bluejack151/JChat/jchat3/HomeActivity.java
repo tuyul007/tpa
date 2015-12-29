@@ -266,6 +266,8 @@ public class HomeActivity extends AppCompatActivity
         userSessionAccount = new Gson().fromJson(userSessionPreferences.getString("user_session", ""), UserAccount.class);
         loadingHandler = (TextView) findViewById(R.id.loadingHandler);
         loadingHandler.setText("");
+
+        toastMsg(userSessionAccount.getEmail()+" "+userSessionAccount.getUserId()+" "+userSessionAccount.getDisplayName());
         ready = false;
 
         tempFriendList = new ArrayList<>();

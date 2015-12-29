@@ -32,6 +32,7 @@ import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.firebase.client.AuthData;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -72,7 +73,13 @@ public class MainActivity extends Activity {
     Firebase userRef;
     Button manualLoginButton;
     HashMap<String,UserAccount> userAccounts;
-
+    void setSession(){
+        loginPreferences = getSharedPreferences("user_session",MODE_PRIVATE);
+        userSessionEditor = loginPreferences.edit();
+        String user_session = new Gson().toJson(loginAccount);
+        userSessionEditor.putString("user_session", user_session);
+        userSessionEditor.commit();
+    }
     void initComponent(){
         email = (EditText)findViewById(R.id.loginEmail);
         password = (EditText)findViewById(R.id.loginPassword);
@@ -84,10 +91,7 @@ public class MainActivity extends Activity {
             Intent i = new Intent(getApplicationContext(),HomeActivity.class);
             startActivity(i);
             finish();
-        }else {
-            loginPreferences = getSharedPreferences("user_session",MODE_PRIVATE);
         }
-
     }
 
     @Override
@@ -206,10 +210,7 @@ public class MainActivity extends Activity {
                 }
                 Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
                 if(message.equals("Login Success")){
-                    userSessionEditor = loginPreferences.edit();
-                    String user_session = new Gson().toJson(loginAccount);
-                    userSessionEditor.putString("user_session", user_session);
-                    userSessionEditor.commit();
+                    setSession();
 
                     Intent i = new Intent(getApplicationContext(),HomeActivity.class);
                     startActivity(i);
@@ -229,49 +230,60 @@ public class MainActivity extends Activity {
 
         fbButton.registerCallback(callbackManager,
                 new FacebookCallback<LoginResult>() {
-                    String idUs;
-
                     @Override
                     public void onSuccess(LoginResult loginResult) {
-                        GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
-                            @Override
-                            public void onCompleted(JSONObject jsonObject, GraphResponse graphResponse) {
-                                //Log.i("LoginActivity", graphResponse.toString());
-                                try {
-                                    //buat tampilin data facebook sesuai kolom nya
-                                    //Toast.makeText(getApplicationContext(), jsonObject.getString("id"), Toast.LENGTH_LONG).show();
-                                    editor.putString("userID", jsonObject.getString("id").toString());
-                                    editor.commit();
-                                    // Toast.makeText(getApplicationContext(), idUs, Toast.LENGTH_LONG).show();
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                                startActivity(pageLoginFacebook);
-
-                            }
-                        });
-
-                        Bundle parameters = new Bundle();
-                        parameters.putString("fields", "id, first_name, last_name, email,gender, birthday, location"); // Parámetros que pedimos a facebook
-                        request.setParameters(parameters);
-                        request.executeAsync();
-
-                        LoginManager.getInstance().logOut();
-
+                            onFacebookAccessTokenChange(loginResult.getAccessToken());
                     }
 
                     @Override
                     public void onCancel() {
-                        Toast.makeText(getApplicationContext(), "Asu Cancel", Toast.LENGTH_LONG).show();
                     }
 
                     @Override
                     public void onError(FacebookException exception) {
-                        Toast.makeText(getApplicationContext(), "Asu Error", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "Auth Error", Toast.LENGTH_LONG).show();
                     }
                 });
 
 
+
+    }
+
+    private void onFacebookAccessTokenChange(AccessToken token) {
+        if (token != null) {
+            userRef.authWithOAuthToken("facebook", token.getToken(), new Firebase.AuthResultHandler() {
+                @Override
+                public void onAuthenticated(AuthData authData) {
+                    if (authData != null) {
+                        String fbID[] = authData.getUid().split(":");
+                        //UserAccount(String userId, String displayName, String email, String password, String gender, String profilePicture,
+                        // int notification, int isPublic, int totalFriend, int totalGroup)
+                        loginAccount = new UserAccount(
+                                fbID[1],
+                                authData.getProviderData().get("displayName").toString(),
+                                authData.getProviderData().get("email").toString(),
+                                authData.getProviderData().get("displayName").toString()
+                                , "",
+                                "", 1, 1, 0, 0);
+
+                        userRef.child(fbID[1]).setValue(loginAccount);
+                        setSession();
+                        startActivity(pageLoginFacebook);
+
+                    }
+                }
+                @Override
+                public void onAuthenticationError(FirebaseError firebaseError) {
+                    // there was an error
+                    Toast.makeText(getApplicationContext(), "there was an error "+firebaseError.toString(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            userRef.unauth();
+        }
+    }
+
+    void onFacebookAuth(AccessToken token){
 
     }
 

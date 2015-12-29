@@ -25,6 +25,7 @@ public class Validator {
         return true;
     }
     public static boolean isAlpha(String word){
+        word = word.trim();
         for (int i=0; i< word.length(); i++){
             if(!Character.isLetter(word.charAt(i)))return false;
         }
