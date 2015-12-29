@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:minWidth="200dp"
+    android:layout_height="500dp"
+    android:minWidth="230dp"
+    android:minHeight="250dp"
     android:weightSum="1"
     android:orientation="vertical">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="213dp">
+        android:layout_height="213dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        >
 
         <ListView
             android:layout_width="match_parent"
@@ -29,11 +33,14 @@
             android:layout_width="113dp"
             android:layout_height="wrap_content"
             android:text="Invite"
+            android:background="@drawable/button_boarder_new"
             android:id="@+id/button6"
             android:layout_gravity="center_horizontal"
             android:onClick="invitePeople"
             android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true" />
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="50dp"
+            />
 
 
     </RelativeLayout>
