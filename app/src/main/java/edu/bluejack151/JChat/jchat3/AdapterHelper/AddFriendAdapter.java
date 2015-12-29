@@ -1,50 +1,119 @@
 package edu.bluejack151.JChat.jchat3.AdapterHelper;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
+import com.google.gson.Gson;
 import com.shiperus.ark.jchat3.R;
 
+import org.w3c.dom.Text;
+
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+
+import edu.bluejack151.JChat.jchat3.AddFriend;
+import edu.bluejack151.JChat.jchat3.FragmentFriend;
+import edu.bluejack151.JChat.jchat3.Helper.Friend;
+import edu.bluejack151.JChat.jchat3.Helper.UserAccount;
+import edu.bluejack151.JChat.jchat3.HomeActivity;
 
 /**
  * Created by shiperus on 12/27/2015.
  */
-public class AddFriendAdapter  extends ArrayAdapter<String> {
+public class AddFriendAdapter  extends ArrayAdapter{
 
-    private Activity context;
-    private ArrayList<String> searchFriendName=new ArrayList<String>();
-    private  ArrayList<Integer> imgSearchFriend=new ArrayList<>();
-    public AddFriendAdapter(Activity context,ArrayList<String> searchFriendName,ArrayList<Integer> imgSearchFriend) {
-        super(context, R.layout.list_search_add_friend, searchFriendName);
+    private ArrayList<UserAccount> userAccounts;
+    private Context context;
+
+    void setSession(View v){
+        SharedPreferences.Editor userSessionEditor = v.getContext().getSharedPreferences("user_session", Context.MODE_PRIVATE).edit();
+        String usersession = new Gson().toJson(HomeActivity.userSessionAccount);
+        userSessionEditor.putString("user_session", usersession);
+        userSessionEditor.commit();
+    }
+    public AddFriendAdapter(Activity context,ArrayList<UserAccount> userAccount) {
+        super(context,R.layout.list_search_add_friend,userAccount);
 
         this.context=context;
-
-        this.searchFriendName=searchFriendName;
-        this.imgSearchFriend=imgSearchFriend;
+        this.userAccounts = userAccount;
     }
+
+    UserAccount getData(int position){
+        return userAccounts.get(position);
+    }
+
     @Override
-    public View getView(int position,View view,ViewGroup parent) {
-        LayoutInflater inflater=context.getLayoutInflater();
-        View rowView=inflater.inflate(R.layout.list_search_add_friend, null, true);
+    public View getView(final int position,View view,ViewGroup parent) {
+        final View newView =  LayoutInflater.from(getContext()).inflate(R.layout.list_search_add_friend, null);
 
-        TextView txtNameSearch = (TextView) rowView.findViewById(R.id.friendNameSearch);
+        TextView txtNameSearch = (TextView) newView.findViewById(R.id.friendNameSearch);
 
-        ImageView profileSearch = (ImageView) rowView.findViewById(R.id.profileSearchPicture);
+        ImageView profileSearch = (ImageView) newView.findViewById(R.id.profileSearchPicture);
 
+        txtNameSearch.setText(getData(position).getDisplayName().toString());
 
-        txtNameSearch.setText(searchFriendName.get(position));
+        if(!getData(position).getProfilePicture().equals("")){
+            //change profile pict
+        }
 
-        profileSearch.setImageResource(imgSearchFriend.get(position));
+        ImageButton btn = (ImageButton)newView.findViewById(R.id.btnAdd);
+        btn.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        AddFriend.friendRef.child(HomeActivity.userSessionAccount.getUserId() + "_" + userAccounts.get(position).getUserId()).setValue(
+                                new Friend(userAccounts.get(position).getUserId(),HomeActivity.userSessionAccount.getUserId(),0)
+                        );
 
+                        AddFriend.friendRef.limitToLast(1).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                                    if (ds.getValue(Friend.class).getUserId().equals(HomeActivity.userSessionAccount.getUserId())) {
+                                        HomeActivity.tempFriendList.get(1).getFriendList().add(new FriendListItem());
+                                        HomeActivity.tempFriendList.get(1).getFriendList().get(
+                                                HomeActivity.tempFriendList.get(1).getFriendList().size() - 1
+                                        ).setFriendIdentity(ds.getValue(Friend.class));
+                                        HomeActivity.tempFriendList.get(1).getFriendList().get(
+                                                HomeActivity.tempFriendList.get(1).getFriendList().size() - 1
+                                        ).setFriendDetail(userAccounts.get(position));;
 
+                                        HomeActivity.userSessionAccount.setTotalFriend((HomeActivity.userSessionAccount.getTotalFriend() + 1));
+                                        AddFriend.userRef.child(HomeActivity.userSessionAccount.getUserId()).setValue(HomeActivity.userSessionAccount);
+                                        setSession(newView);
 
-        return rowView;
+                                        FragmentFriend.adapter.setFriendAndGroupList(HomeActivity.tempFriendList);
+                                        FragmentFriend.adapter.notifyDataSetChanged();
+
+                                        HomeActivity.friendCount++;
+                                        ((Activity)context).finish();
+                                    }
+                                }
+
+                            }
+
+                            @Override
+                            public void onCancelled(FirebaseError firebaseError) {
+
+                            }
+                        });
+                    }
+                }
+        );
+
+        return newView;
 
     };
 }
