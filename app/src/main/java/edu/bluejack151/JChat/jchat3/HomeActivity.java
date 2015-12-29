@@ -101,7 +101,7 @@ public class HomeActivity extends AppCompatActivity
         chatRef = new Firebase("https://jchatapps.firebaseio.com/chat");
         groupNotifRef = new Firebase("https://jchatapps.firebaseio.com/groupnotif");
         updateChatHistory();
-
+//        groupRef.push().setva -> cara push dan isi datanya
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -373,6 +373,7 @@ public class HomeActivity extends AppCompatActivity
         setContentView(R.layout.activity_home);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar); //tes lagi , kemaren2 soalnya null skrg kgk ;__;
+
         getSupportActionBar().setTitle("Friend");
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(

@@ -6,18 +6,18 @@
 
     <item
 
-        android:icon="@drawable/ic_create_group"
+        android:icon="@drawable/ic_add_group_icon_new"
         android:id="@+id/action_settings_create_group"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
+        android:title=""
         app:showAsAction="ifRoom" />
 
     <item
 
-        android:icon="@drawable/ic_addfriend_icon"
+        android:icon="@drawable/ic_add_friend_icon_new"
         android:id="@+id/action_settings"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
+        android:title=""
         app:showAsAction="ifRoom" />
 
 

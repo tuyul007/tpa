@@ -3,6 +3,7 @@
     package="com.shiperus.ark.jchat3">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -10,15 +11,12 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="edu.bluejack151.JChat.jchat3.MainActivity"
-
-            >
+        <activity android:name="edu.bluejack151.JChat.jchat3.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
         <activity android:name="edu.bluejack151.JChat.jchat3.RegisterActivity" />
         <activity
@@ -37,7 +35,8 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name="edu.bluejack151.JChat.jchat3.AccountSetting" />
         <activity android:name="edu.bluejack151.JChat.jchat3.AddFriend" />
-        <activity android:name="edu.bluejack151.JChat.jchat3.CreateGroup"></activity>
+        <activity android:name="edu.bluejack151.JChat.jchat3.CreateGroup" />
+        <activity android:name="edu.bluejack151.JChat.jchat3.GambarDafuq"></activity>
     </application>
 
 </manifest>
