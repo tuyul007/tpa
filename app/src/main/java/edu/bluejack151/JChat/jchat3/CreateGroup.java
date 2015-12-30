@@ -65,7 +65,7 @@ public class CreateGroup extends AppCompatActivity {
     }
 
      ListView lv;
-
+    ArrayList<String> listInvitedFriend=new ArrayList<String>();
     public void inviteDialog(View v)
     {
 
@@ -107,6 +107,15 @@ public class CreateGroup extends AppCompatActivity {
                 CheckedTextView chkTxtView=(CheckedTextView)lv1.getChildAt(position).findViewById(R.id.chkInviteFriend);
                 chkTxtView.setChecked(!chkTxtView.isChecked());
 
+                if(chkTxtView.isChecked()==true)
+                {
+                    listInvitedFriend.add(position+"");
+                }
+                else if(chkTxtView.isChecked()==false)
+                {
+                    listInvitedFriend.remove(listInvitedFriend.indexOf(position+""));
+                }
+                Toast.makeText(getBaseContext(), listInvitedFriend.size()+"", Toast.LENGTH_SHORT).show();
 //                chk.setOnClickListener(new View.OnClickListener() {
 //                    @Override
 //                    public void onClick(View v) {
