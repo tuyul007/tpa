@@ -38,6 +38,7 @@ import java.util.HashMap;
 import android.support.design.widget.TabLayout;
 
 import edu.bluejack151.JChat.jchat3.AdapterHelper.ChatAdapterItem;
+import edu.bluejack151.JChat.jchat3.AdapterHelper.ChatListItem;
 import edu.bluejack151.JChat.jchat3.AdapterHelper.FriendListItem;
 import edu.bluejack151.JChat.jchat3.AdapterHelper.GroupNotif;
 import edu.bluejack151.JChat.jchat3.AdapterHelper.ParentFriendListItem;
@@ -62,7 +63,7 @@ public class HomeActivity extends AppCompatActivity
     Chat c;
 
     public static ArrayList<ParentFriendListItem> tempFriendList;
-    public static HashMap<String, ChatAdapterItem> chatList;
+    public static HashMap<String, ChatListItem> chatList;
     public static HashMap<String, UserAccount> friendAccountList;
     public static Integer friendCount = 0, groupCount = 0, userCount = 0, totalGroup = 0;
     Boolean ready;
@@ -182,7 +183,7 @@ public class HomeActivity extends AppCompatActivity
             public void onChildAdded(final DataSnapshot chatSnapshot, final String s) {
                 groupRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onDataChange(final DataSnapshot dataSnapshot) {
+                    public void onDataChange(final DataSnapshot groupSnapshot) {
                         groupNotifRef.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(final DataSnapshot notifSnapshot) {
@@ -195,31 +196,30 @@ public class HomeActivity extends AppCompatActivity
                                                 final Chat c = chatSnapshot.getValue(Chat.class);
                                                 if (!c.getGroupId().equals("")) {
                                                     if (chatList.get(c.getGroupId()) == null &&
-                                                            dataSnapshot.hasChild(c.getGroupId() + "_" + userSessionAccount.getUserId())) {
-                                                        final ChatAdapterItem cai = new ChatAdapterItem();
-                                                        cai.setLastChat(c);
-                                                        cai.setGroup(dataSnapshot.child(c.getGroupId() + "_" + userSessionAccount.getUserId()).getValue(GroupIdentity.class));
+                                                            groupSnapshot.hasChild(c.getGroupId() + "_" + userSessionAccount.getUserId())) {
+                                                        chatList.put(c.getGroupId(), new ChatListItem());
+                                                        chatList.get(c.getGroupId()).setLastChat(c);
+                                                        chatList.get(c.getGroupId()).setGroup(groupSnapshot.child(c.getGroupId() + "_" + userSessionAccount.getUserId()).getValue(GroupIdentity.class));
                                                         if (notifSnapshot.getChildrenCount() != 0) {
                                                             for (DataSnapshot ds : notifSnapshot.getChildren()) {
                                                                 GroupNotif gn = ds.getValue(GroupNotif.class);
-                                                                if (gn.getGroupId().equals(cai.getGroup()) && gn.getUserId().equals(userSessionAccount.getUserId()))
-                                                                    cai.setNotifCount(cai.getNotifCount() + 1);
+                                                                if (gn.getGroupId().equals(chatList.get(c.getGroupId()).getGroup()) && gn.getUserId().equals(userSessionAccount.getUserId()))
+                                                                    chatList.get(c.getGroupId()).setNotifCount(chatList.get(c.getGroupId()).getNotifCount() + 1);
                                                             }
                                                         }
-                                                        chatList.put(c.getGroupId(), cai);
                                                         FragmentChat.updateView();
-                                                    } else if (dataSnapshot.hasChild(c.getGroupId() + "_" + userSessionAccount.getUserId())) {
+                                                    } else if (groupSnapshot.hasChild(c.getGroupId() + "_" + userSessionAccount.getUserId())) {
                                                         chatList.get(c.getGroupId()).setLastChat(c);
                                                         FragmentChat.updateView();
                                                     }
                                                 } else {
                                                     if (c.getToId().equals(userSessionAccount.getUserId())) {
                                                         if (chatList.get(c.getFromId()) == null) {
-                                                            chatList.put(c.getFromId(), new ChatAdapterItem());
+                                                            chatList.put(c.getFromId(), new ChatListItem());
                                                             chatList.get(c.getFromId()).setUser(userSnapshot.child(c.getFromId()).getValue(UserAccount.class));
                                                         }
-                                                        if (dataSnapshot.hasChild(userSessionAccount.getUserId() + "_" + c.getToId())) {
-                                                            Friend f = dataSnapshot.child(userSessionAccount.getUserId() + "_" + c.getToId()).getValue(Friend.class);
+                                                        if (friendSnapshot.hasChild(userSessionAccount.getUserId() + "_" + c.getToId())) {
+                                                            Friend f = friendSnapshot.child(userSessionAccount.getUserId() + "_" + c.getToId()).getValue(Friend.class);
                                                             if (f.getBlocked() == 0) {
                                                                 chatList.get(c.getFromId()).setLastChat(c);
                                                                 if (c.getPrivateStatus() == 0) {

@@ -17,6 +17,7 @@ import java.util.Map;
 
 import edu.bluejack151.JChat.jchat3.AdapterHelper.ChatAdapterItem;
 import edu.bluejack151.JChat.jchat3.AdapterHelper.ChatListAdapter;
+import edu.bluejack151.JChat.jchat3.AdapterHelper.ChatListItem;
 import edu.bluejack151.JChat.jchat3.Helper.Chat;
 
 /**
@@ -43,11 +44,20 @@ public class FragmentChat extends android.support.v4.app.Fragment {
     public static void updateView(){
         if(listChatView!=null) {
             int idx = 0;
-            for (Map.Entry<String, ChatAdapterItem> data : HomeActivity.chatList.entrySet()) {
+            for (Map.Entry<String, ChatListItem> data : HomeActivity.chatList.entrySet()) {
                 if(listChatView.size()-1<idx || listChatView.size()==0){
-                    listChatView.add(data.getValue());
+                    listChatView.add(new ChatAdapterItem());
+                    listChatView.get(listChatView.size()-1).setNotifCount(data.getValue().getNotifCount());
+                    listChatView.get(listChatView.size()-1).setUser(data.getValue().getUser());
+                    listChatView.get(listChatView.size()-1).setGroup(data.getValue().getGroup());
+                    listChatView.get(listChatView.size()-1).setLastChat(data.getValue().getLastChat());
+
                 }else{
-                    listChatView.set(idx,data.getValue());
+
+                    listChatView.get(idx).setNotifCount(data.getValue().getNotifCount());
+                    listChatView.get(idx).setUser(data.getValue().getUser());
+                    listChatView.get(idx).setGroup(data.getValue().getGroup());
+                    listChatView.get(idx).setLastChat(data.getValue().getLastChat());
                 }
                 idx++;
             }
