@@ -39,9 +39,7 @@ public class RegisterActivity extends AppCompatActivity {
     RadioButton radioFemale;
     Button btnSubmit;
     Button btnReset;
-    Boolean successRegister;
     String message;
-    HashMap<String,UserAccount> userAcc;
 
     private void initComponent(){
         userId = (EditText)findViewById(R.id.fieldRegisUserID);
@@ -54,9 +52,6 @@ public class RegisterActivity extends AppCompatActivity {
         btnSubmit = (Button)findViewById(R.id.submitRegisButton);
         btnReset = (Button)findViewById(R.id.resetRegisButton);
 
-        userAcc = new HashMap<>();
-
-        successRegister = false;
         message = "";
     }
 
@@ -69,82 +64,60 @@ public class RegisterActivity extends AppCompatActivity {
 
         final Firebase userRef = new Firebase("https://jchatapps.firebaseio.com/user");
 
-        userRef.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                if (successRegister) {
-                    Intent i = new Intent(getApplicationContext(), MainActivity.class);
-                    startActivity(i);
-                    finish();
-                } else {
-                    userAcc.put(dataSnapshot.getKey(), dataSnapshot.getValue(UserAccount.class));
-
-                }
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-
-            }
-        });
-
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                message = "";
-                if (!Validator.checkUserID(userId.getText().toString())) {
-                    message = "User ID must be alphabet or numeric, 6-8 character";
-                } else if (!Validator.checkLength(displayName.getText().toString(), 3, 20) ||
-                        !Validator.isAlpha(displayName.getText().toString())) {
-                    message = "Display Name must be alphabet, 3-20 character";
-                } else if (!Validator.validateEmail(email.getText())) {
-                    message = "Email format is wrong";
-                } else if (!Validator.checkLength(password.getText().toString(), 4, 20)
-                        || !Validator.isAlphaNumeric(password.getText().toString())) {
-                    message = "Password must be alphanumeric, 4-20 character";
-                } else if (userAcc.containsKey(userId.getText().toString())) {
-                    message = "User ID has already used";
-                } else {
-                    message = "Register Success";
-                    successRegister = true;
+                userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        message = "";
+                        if (!Validator.checkUserID(userId.getText().toString())) {
+                            message = "User ID must be alphabet or numeric, 6-8 character";
+                        } else if (!Validator.checkLength(displayName.getText().toString(), 3, 20) ||
+                                !Validator.isAlpha(displayName.getText().toString())) {
+                            message = "Display Name must be alphabet, 3-20 character";
+                        } else if (!Validator.validateEmail(email.getText())) {
+                            message = "Email format is wrong";
+                        } else if (!Validator.checkLength(password.getText().toString(), 4, 20)
+                                || !Validator.isAlphaNumeric(password.getText().toString())) {
+                            message = "Password must be alphanumeric, 4-20 character";
+                        } else {
+                            message = "Register Success";
+                            for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                                if (ds.getValue(UserAccount.class).getUserId().equals(userId.getText().toString())) {
+                                    message = "User ID has already used";
+                                    break;
+                                }
+                            }
+                        }
+                        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                        if (message.equals("Register Success")) {
+                            //insertDatabase
+                            String gender = "Male";
+                            if (radioFemale.isChecked()) gender = "Female";
 
-                    //insertDatabase
-                    String gender = "Male";
-                    if (radioFemale.isChecked()) gender = "Female";
+                            userRef.child(userId.getText().toString())
+                                    .setValue(new UserAccount(
+                                            userId.getText().toString(),
+                                            displayName.getText().toString(),
+                                            email.getText().toString(),
+                                            password.getText().toString(),
+                                            gender,
+                                            "",
+                                            1,
+                                            1,
+                                            0,
+                                            0
+                                    ));
+                            finish();
+                        }
+                    }
 
-                    userRef.child(userId.getText().toString())
-                            .setValue(new UserAccount(
-                                    userId.getText().toString(),
-                                    displayName.getText().toString(),
-                                    email.getText().toString(),
-                                    password.getText().toString(),
-                                    gender,
-                                    "",
-                                    1,
-                                    1,
-                                    0,
-                                    0
-                            ));
+                    @Override
+                    public void onCancelled(FirebaseError firebaseError) {
 
-                }
-                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-
-
+                    }
+                });
             }
         });
 
