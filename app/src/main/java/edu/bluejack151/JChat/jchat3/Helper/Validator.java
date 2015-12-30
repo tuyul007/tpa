@@ -16,8 +16,8 @@ public class Validator {
             return false;
         }else{
             for (int i=0; i< userId.length(); i++){
-                if(!Character.isLetter(userId.charAt(i))){
-                    if(!Character.isDigit(userId.charAt(i)))return false;
+                if(!Character.isLetter(userId.charAt(i)) && !Character.isDigit(userId.charAt(i))){
+                    return false;
                 }
 
             }
@@ -25,9 +25,10 @@ public class Validator {
         return true;
     }
     public static boolean isAlpha(String word){
-        word = word.trim();
+        if(word.charAt(0) == ' ' || word.charAt(word.length()-1) == ' ')return false;
         for (int i=0; i< word.length(); i++){
-            if(!Character.isLetter(word.charAt(i)))return false;
+            if(word.charAt(i) == ' ');
+            else if(!Character.isLetter(word.charAt(i)))return false;
         }
         return true;
     }

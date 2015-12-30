@@ -73,10 +73,10 @@ public class MainActivity extends Activity {
     Firebase userRef;
     Button manualLoginButton;
     HashMap<String,UserAccount> userAccounts;
-    void setSession(){
+    void setSession(UserAccount user){
         loginPreferences = getSharedPreferences("user_session",MODE_PRIVATE);
         userSessionEditor = loginPreferences.edit();
-        String user_session = new Gson().toJson(loginAccount);
+        String user_session = new Gson().toJson(user);
         userSessionEditor.putString("user_session", user_session);
         userSessionEditor.commit();
     }
@@ -117,16 +117,6 @@ public class MainActivity extends Activity {
 
     }
 
-    boolean loginUserAccount(String email,String password){
-        for (Map.Entry<String,UserAccount> data : userAccounts.entrySet()){
-            loginAccount = data.getValue();
-            if(loginAccount.getEmail().equals(email)
-                    && loginAccount.getPassword().equals(password)){
-                return true;
-            }
-        }
-        return false;
-    }
     Firebase uploadedImageTesRef;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -200,22 +190,37 @@ public class MainActivity extends Activity {
         manualLoginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String message = "";
-                if(email.getText().toString().equals("") || password.getText().toString().equals("")){
-                    message = "All field must be filled";
-                }else if(!loginUserAccount(email.getText().toString(),password.getText().toString())){
-                    message = "Invalid username/password";
-                }else{
-                    message = "Login Success";
-                }
-                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-                if(message.equals("Login Success")){
-                    setSession();
+                userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        String message = "";
+                        if (email.getText().toString().equals("") || password.getText().toString().equals("")) {
+                            message = "All field must be filled";
+                        } else {
+                            message = "Invalid username/password";
+                            for(DataSnapshot ds : dataSnapshot.getChildren()){
+                                if(ds.getValue(UserAccount.class).getEmail().equals(email.getText().toString())
+                                    && ds.getValue(UserAccount.class).getPassword().equals(password.getText().toString())){
+                                    loginAccount =  ds.getValue(UserAccount.class);
+                                    message = "Login Success";break;
+                                }
+                            }
+                        }
+                        if(message.equals("Login Success")){
+                            setSession(loginAccount);
+                            Intent i = new Intent(getApplicationContext(), HomeActivity.class);
+                            startActivity(i);
+                            finish();
+                        }else {
+                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                        }
+                    }
 
-                    Intent i = new Intent(getApplicationContext(),HomeActivity.class);
-                    startActivity(i);
-                    finish();
-                }
+                    @Override
+                    public void onCancelled(FirebaseError firebaseError) {
+
+                    }
+                });
             }
         });
 
@@ -256,7 +261,7 @@ public class MainActivity extends Activity {
                 @Override
                 public void onAuthenticated(AuthData authData) {
                     if (authData != null) {
-                        String fbID[] = authData.getUid().split(":");
+                        final String fbID[] = authData.getUid().split(":");
                         //UserAccount(String userId, String displayName, String email, String password, String gender, String profilePicture,
                         // int notification, int isPublic, int totalFriend, int totalGroup)
                         loginAccount = new UserAccount(
@@ -267,9 +272,23 @@ public class MainActivity extends Activity {
                                 , "",
                                 "", 1, 1, 0, 0);
 
-                        userRef.child(fbID[1]).setValue(loginAccount);
-                        setSession();
-                        startActivity(pageLoginFacebook);
+                        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                if(dataSnapshot.hasChild(fbID[1])){
+                                    loginAccount = dataSnapshot.child(fbID[1]).getValue(UserAccount.class);
+                                }
+                                setSession(loginAccount);
+                                startActivity(pageLoginFacebook);
+                                LoginManager.getInstance().logOut();
+                                finish();
+                            }
+
+                            @Override
+                            public void onCancelled(FirebaseError firebaseError) {
+
+                            }
+                        });
 
                     }
                 }

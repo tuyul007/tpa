@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
@@ -36,13 +37,6 @@ public class AddFriendAdapter  extends ArrayAdapter{
 
     private ArrayList<UserAccount> userAccounts;
     private Context context;
-
-    void setSession(View v){
-        SharedPreferences.Editor userSessionEditor = v.getContext().getSharedPreferences("user_session", Context.MODE_PRIVATE).edit();
-        String usersession = new Gson().toJson(HomeActivity.userSessionAccount);
-        userSessionEditor.putString("user_session", usersession);
-        userSessionEditor.commit();
-    }
     public AddFriendAdapter(Activity context,ArrayList<UserAccount> userAccount) {
         super(context,R.layout.list_search_add_friend,userAccount);
 
@@ -76,39 +70,21 @@ public class AddFriendAdapter  extends ArrayAdapter{
                         AddFriend.friendRef.child(HomeActivity.userSessionAccount.getUserId() + "_" + userAccounts.get(position).getUserId()).setValue(
                                 new Friend(userAccounts.get(position).getUserId(),HomeActivity.userSessionAccount.getUserId(),0)
                         );
+                        HomeActivity.tempFriendList.get(1).getFriendList().add(new FriendListItem());
+                        HomeActivity.tempFriendList.get(1).getFriendList().get(
+                                HomeActivity.tempFriendList.get(1).getFriendList().size() - 1
+                        ).setFriendIdentity(new Friend(userAccounts.get(position).getUserId(), HomeActivity.userSessionAccount.getUserId(), 0));
+                        HomeActivity.tempFriendList.get(1).getFriendList().get(
+                                HomeActivity.tempFriendList.get(1).getFriendList().size() - 1
+                        ).setFriendDetail(userAccounts.get(position));;
+                        HomeActivity.userSessionAccount.setTotalFriend((HomeActivity.userSessionAccount.getTotalFriend() + 1));
+                        AddFriend.userRef.child(HomeActivity.userSessionAccount.getUserId()).setValue(HomeActivity.userSessionAccount);
 
-                        AddFriend.friendRef.limitToLast(1).addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                                    if (ds.getValue(Friend.class).getUserId().equals(HomeActivity.userSessionAccount.getUserId())) {
-                                        HomeActivity.tempFriendList.get(1).getFriendList().add(new FriendListItem());
-                                        HomeActivity.tempFriendList.get(1).getFriendList().get(
-                                                HomeActivity.tempFriendList.get(1).getFriendList().size() - 1
-                                        ).setFriendIdentity(ds.getValue(Friend.class));
-                                        HomeActivity.tempFriendList.get(1).getFriendList().get(
-                                                HomeActivity.tempFriendList.get(1).getFriendList().size() - 1
-                                        ).setFriendDetail(userAccounts.get(position));;
+                        FragmentFriend.adapter.setFriendAndGroupList(HomeActivity.tempFriendList);
+                        FragmentFriend.adapter.notifyDataSetChanged();
 
-                                        HomeActivity.userSessionAccount.setTotalFriend((HomeActivity.userSessionAccount.getTotalFriend() + 1));
-                                        AddFriend.userRef.child(HomeActivity.userSessionAccount.getUserId()).setValue(HomeActivity.userSessionAccount);
-                                        setSession(newView);
-
-                                        FragmentFriend.adapter.setFriendAndGroupList(HomeActivity.tempFriendList);
-                                        FragmentFriend.adapter.notifyDataSetChanged();
-
-                                        HomeActivity.friendCount++;
-                                        ((Activity)context).finish();
-                                    }
-                                }
-
-                            }
-
-                            @Override
-                            public void onCancelled(FirebaseError firebaseError) {
-
-                            }
-                        });
+                        HomeActivity.friendCount++;
+                        ((Activity)context).finish();
                     }
                 }
         );

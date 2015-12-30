@@ -67,13 +67,6 @@ public class FragmentFriend  extends android.support.v4.app.Fragment{
         return newWord;
     }
 
-    void setSession(){
-        SharedPreferences.Editor userSessionEditor = getActivity().getSharedPreferences("user_session",Context.MODE_PRIVATE).edit();
-        String usersession = new Gson().toJson(HomeActivity.userSessionAccount);
-        userSessionEditor.putString("user_session", usersession);
-        userSessionEditor.commit();
-    }
-
     void toastMsg(String msg){
         Toast.makeText(getContext(),msg,Toast.LENGTH_SHORT).show();
     }
@@ -124,7 +117,7 @@ public class FragmentFriend  extends android.support.v4.app.Fragment{
         View view=inflater.inflate(R.layout.fragmentfriend,container,false);
         elv = (ExpandableListView) view.findViewById(R.id.friendListView);
         fieldSearchFriend = (EditText)view.findViewById(R.id.inputContactName);
-        listGroupAndFriend = (ArrayList<ParentFriendListItem>) HomeActivity.tempFriendList.clone();
+        listGroupAndFriend = HomeActivity.tempFriendList;
         adapter = new SavedTabsListAdapter(getActivity(), listGroupAndFriend);
         initModalDialog();
         initFirebase();
@@ -191,7 +184,6 @@ public class FragmentFriend  extends android.support.v4.app.Fragment{
 
                         HomeActivity.userSessionAccount.setTotalGroup((HomeActivity.userSessionAccount.getTotalGroup() + 1));
                         userRef.child(HomeActivity.userSessionAccount.getUserId()).setValue(HomeActivity.userSessionAccount);
-                        setSession();
 
                         adapter.notifyDataSetChanged();
                         dialog.dismiss();
@@ -211,7 +203,6 @@ public class FragmentFriend  extends android.support.v4.app.Fragment{
                     if(popUpMenu2.getText().equals("Leave Group")){
                         HomeActivity.userSessionAccount.setTotalGroup((HomeActivity.userSessionAccount.getTotalGroup() - 1));
                         userRef.child(HomeActivity.userSessionAccount.getUserId()).setValue(HomeActivity.userSessionAccount);
-                        setSession();
                     }
                     HomeActivity.totalGroup--;
                     adapter.notifyDataSetChanged();
