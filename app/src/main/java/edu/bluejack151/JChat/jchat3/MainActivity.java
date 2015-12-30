@@ -199,6 +199,7 @@ public class MainActivity extends Activity {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
                             onFacebookAccessTokenChange(loginResult.getAccessToken());
+                        LoginManager.getInstance().logOut();
                     }
 
                     @Override
