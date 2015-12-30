@@ -1,13 +1,11 @@
 package edu.bluejack151.JChat.jchat3;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -19,6 +17,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,7 +37,6 @@ import java.util.HashMap;
 
 import android.support.design.widget.TabLayout;
 
-import edu.bluejack151.JChat.jchat3.AdapterHelper.ChatAdapterItem;
 import edu.bluejack151.JChat.jchat3.AdapterHelper.ChatListItem;
 import edu.bluejack151.JChat.jchat3.AdapterHelper.FriendListItem;
 import edu.bluejack151.JChat.jchat3.AdapterHelper.GroupNotif;
@@ -55,11 +54,14 @@ public class HomeActivity extends AppCompatActivity
     }
 
     SharedPreferences shrd;
-    Firebase friendRef, userRef, groupRef, chatRef, groupNotifRef;
-    ProgressDialog progressDialog;
-    Handler handler;
+    public static final Firebase groupRef = new Firebase("https://jchatapps.firebaseio.com/group");
+    public static final Firebase friendRef = new Firebase("https://jchatapps.firebaseio.com/friend");
+    public static final Firebase userRef = new Firebase("https://jchatapps.firebaseio.com/user");
+    public static final Firebase chatRef = new Firebase("https://jchatapps.firebaseio.com/chat");
+    public static final Firebase groupNotifRef = new Firebase("https://jchatapps.firebaseio.com/groupnotif");
+
     TextView loadingHandler;
-    Boolean updateGroup = false,updateUser=false;
+    Boolean updateGroup = false,updateUser=false,updateChat = false;
     Chat c;
 
     public static ArrayList<ParentFriendListItem> tempFriendList;
@@ -105,12 +107,6 @@ public class HomeActivity extends AppCompatActivity
     }
 
     void initDatabase() {
-
-        groupRef = new Firebase("https://jchatapps.firebaseio.com/group");
-        friendRef = new Firebase("https://jchatapps.firebaseio.com/friend");
-        userRef = new Firebase("https://jchatapps.firebaseio.com/user");
-        chatRef = new Firebase("https://jchatapps.firebaseio.com/chat");
-        groupNotifRef = new Firebase("https://jchatapps.firebaseio.com/groupnotif");
         updateChatHistory();
         checkUpdates();
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -178,7 +174,7 @@ public class HomeActivity extends AppCompatActivity
     }
 
     void updateChatHistory() {
-        chatRef.orderByChild("timeStamp").addChildEventListener(new ChildEventListener() {
+        chatRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(final DataSnapshot chatSnapshot, final String s) {
                 groupRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -194,46 +190,63 @@ public class HomeActivity extends AppCompatActivity
                                             @Override
                                             public void onDataChange(DataSnapshot friendSnapshot) {
                                                 final Chat c = chatSnapshot.getValue(Chat.class);
-                                                if (!c.getGroupId().equals("")) {
-                                                    if (chatList.get(c.getGroupId()) == null &&
-                                                            groupSnapshot.hasChild(c.getGroupId() + "_" + userSessionAccount.getUserId())) {
-                                                        chatList.put(c.getGroupId(), new ChatListItem());
-                                                        chatList.get(c.getGroupId()).setLastChat(c);
-                                                        chatList.get(c.getGroupId()).setGroup(groupSnapshot.child(c.getGroupId() + "_" + userSessionAccount.getUserId()).getValue(GroupIdentity.class));
-                                                        if (notifSnapshot.getChildrenCount() != 0) {
-                                                            for (DataSnapshot ds : notifSnapshot.getChildren()) {
-                                                                GroupNotif gn = ds.getValue(GroupNotif.class);
-                                                                if (gn.getGroupId().equals(chatList.get(c.getGroupId()).getGroup()) && gn.getUserId().equals(userSessionAccount.getUserId()))
-                                                                    chatList.get(c.getGroupId()).setNotifCount(chatList.get(c.getGroupId()).getNotifCount() + 1);
-                                                            }
-                                                        }
-                                                        FragmentChat.updateView();
-                                                    } else if (groupSnapshot.hasChild(c.getGroupId() + "_" + userSessionAccount.getUserId())) {
-                                                        chatList.get(c.getGroupId()).setLastChat(c);
-                                                        FragmentChat.updateView();
-                                                    }
-                                                } else {
-                                                    if (c.getToId().equals(userSessionAccount.getUserId())) {
-                                                        if (chatList.get(c.getFromId()) == null) {
-                                                            chatList.put(c.getFromId(), new ChatListItem());
-                                                            chatList.get(c.getFromId()).setUser(userSnapshot.child(c.getFromId()).getValue(UserAccount.class));
-                                                        }
-                                                        if (friendSnapshot.hasChild(userSessionAccount.getUserId() + "_" + c.getToId())) {
-                                                            Friend f = friendSnapshot.child(userSessionAccount.getUserId() + "_" + c.getToId()).getValue(Friend.class);
-                                                            if (f.getBlocked() == 0) {
-                                                                chatList.get(c.getFromId()).setLastChat(c);
-                                                                if (c.getPrivateStatus() == 0) {
-                                                                    chatList.get(c.getFromId()).setNotifCount(chatList.get(c.getFromId()).getNotifCount() + 1);
+                                                if(c.getTimeStamp()!=0) {
+                                                    if (!c.getGroupId().equals("")) {
+                                                        if (chatList.get(c.getGroupId()) == null &&
+                                                                groupSnapshot.hasChild(c.getGroupId() + "_" + userSessionAccount.getUserId())) {
+                                                            chatList.put(c.getGroupId(), new ChatListItem());
+                                                            chatList.get(c.getGroupId()).setLastChat(c);
+                                                            chatList.get(c.getGroupId()).setGroup(groupSnapshot.child(c.getGroupId() + "_" + userSessionAccount.getUserId()).getValue(GroupIdentity.class));
+                                                            if (notifSnapshot.getChildrenCount() != 0) {
+                                                                for (DataSnapshot ds : notifSnapshot.getChildren()) {
+                                                                    GroupNotif gn = ds.getValue(GroupNotif.class);
+                                                                    if (gn.getGroupId().equals(chatList.get(c.getGroupId()).getGroup()) && gn.getUserId().equals(userSessionAccount.getUserId()))
+                                                                        chatList.get(c.getGroupId()).setNotifCount(chatList.get(c.getGroupId()).getNotifCount() + 1);
                                                                 }
-                                                                FragmentChat.updateView();
                                                             }
-                                                            return;
+                                                            FragmentChat.updateView();
+                                                        } else if (groupSnapshot.hasChild(c.getGroupId() + "_" + userSessionAccount.getUserId())) {
+                                                            chatList.get(c.getGroupId()).setLastChat(c);
+                                                            FragmentChat.updateView();
                                                         }
-                                                        chatList.get(c.getFromId()).setLastChat(c);
-                                                        if (c.getPrivateStatus() == 0) {
-                                                            chatList.get(c.getFromId()).setNotifCount(chatList.get(c.getFromId()).getNotifCount() + 1);
+                                                    } else {
+                                                        if (c.getFromId().equals(userSessionAccount.getUserId())
+                                                                ||c.getToId().equals(userSessionAccount.getUserId())) {
+
+                                                            String friendId = c.getFromId();
+                                                            if(c.getFromId().equals(userSessionAccount.getUserId())){
+                                                                friendId = c.getToId();
+                                                            }
+
+                                                            if (chatList.get(friendId) == null) {
+                                                                chatList.put(friendId, new ChatListItem());
+                                                                chatList.get(friendId).setUser(userSnapshot.child(friendId).getValue(UserAccount.class));
+                                                            }
+                                                            if (friendSnapshot.hasChild(userSessionAccount.getUserId() + "_" + friendId)) {
+                                                                Friend f = friendSnapshot.child(userSessionAccount.getUserId() + "_" + friendId).getValue(Friend.class);
+                                                                if (f.getBlocked() == 0) {
+                                                                    chatList.get(friendId).setLastChat(c);
+                                                                    if (!c.getFromId().equals(userSessionAccount.getUserId()) && c.getPrivateStatus() == 0) {
+                                                                        chatList.get(friendId).setNotifCount(chatList.get(friendId).getNotifCount() + 1);
+                                                                    }
+                                                                    FragmentChat.updateView();
+                                                                    if(PrivateChatActivity.isActive){
+                                                                        PrivateChatActivity.adapter.setChatViewList(chatList.get(friendId).getListChat());
+                                                                        PrivateChatActivity.adapter.notifyDataSetChanged();
+                                                                    }
+                                                                }
+                                                                return;
+                                                            }
+                                                            chatList.get(friendId).setLastChat(c);
+                                                            if (!c.getFromId().equals(userSessionAccount.getUserId()) &&c.getPrivateStatus() == 0) {
+                                                                chatList.get(friendId).setNotifCount(chatList.get(friendId).getNotifCount() + 1);
+                                                            }
+                                                            FragmentChat.updateView();
+                                                            if(PrivateChatActivity.isActive){
+                                                                PrivateChatActivity.adapter.setChatViewList(chatList.get(friendId).getListChat());
+                                                                PrivateChatActivity.adapter.notifyDataSetChanged();
+                                                            }
                                                         }
-                                                        FragmentChat.updateView();
                                                     }
                                                 }
                                             }
@@ -270,7 +283,6 @@ public class HomeActivity extends AppCompatActivity
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
             }
 
             @Override
@@ -396,8 +408,12 @@ public class HomeActivity extends AppCompatActivity
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                if(!updateUser)return;
                 if(dataSnapshot.getValue(UserAccount.class).getUserId().equals(userSessionAccount.getUserId()))
                     setSession(dataSnapshot.getValue(UserAccount.class));
+                else{
+                    friendAccountList.put(dataSnapshot.getKey(), dataSnapshot.getValue(UserAccount.class));
+                }
             }
 
             @Override

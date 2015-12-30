@@ -30,6 +30,7 @@ import com.shiperus.ark.jchat3.R;
 
 import java.util.ArrayList;
 
+import edu.bluejack151.JChat.jchat3.AdapterHelper.ChatListItem;
 import edu.bluejack151.JChat.jchat3.AdapterHelper.FriendListItem;
 import edu.bluejack151.JChat.jchat3.AdapterHelper.ParentFriendListItem;
 import edu.bluejack151.JChat.jchat3.Helper.Friend;
@@ -226,7 +227,16 @@ public class FragmentFriend  extends android.support.v4.app.Fragment{
                 @Override
                 public void onClick(View v) {
                     //chat
-                    toastMsg("friend chat");
+                    if(HomeActivity.chatList.get(fl.getFriendDetail().getUserId())==null) {
+                        PrivateChatActivity.listChat = new ChatListItem();
+                        PrivateChatActivity.listChat.setUser(fl.getFriendDetail());
+                    }else
+                        PrivateChatActivity.listChat =HomeActivity.chatList.get(fl.getFriendDetail().getUserId());
+
+                    Intent i = new Intent(getActivity(),PrivateChatActivity.class);
+                    startActivity(i);
+
+                    dialog.dismiss();
                 }
             });
             popUpMenu2.setOnClickListener(new View.OnClickListener() {

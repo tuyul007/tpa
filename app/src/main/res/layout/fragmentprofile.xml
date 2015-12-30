@@ -20,7 +20,7 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Lorem Ipsum BLALALALALALLAAL"
         android:layout_gravity="center_horizontal"
-        android:id="@+id/textView2" />
+        android:id="@+id/message" />
 
     <Button
         android:layout_width="wrap_content"

@@ -2,9 +2,13 @@ package edu.bluejack151.JChat.jchat3.AdapterHelper;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
+import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -16,6 +20,8 @@ import java.util.ArrayList;
 import edu.bluejack151.JChat.jchat3.Helper.Chat;
 import edu.bluejack151.JChat.jchat3.Helper.GroupIdentity;
 import edu.bluejack151.JChat.jchat3.Helper.UserAccount;
+import edu.bluejack151.JChat.jchat3.HomeActivity;
+import edu.bluejack151.JChat.jchat3.PrivateChatActivity;
 
 /**
  * Created by shiperus on 12/27/2015.
@@ -60,7 +66,7 @@ public class ChatListAdapter extends ArrayAdapter{
     }
 
     @Override
-    public View getView(int position,View view,ViewGroup parent) {
+    public View getView(final int position,View view,ViewGroup parent) {
         LayoutInflater inflater=context.getLayoutInflater();
         if(view == null)view = LayoutInflater.from(getContext()).inflate(R.layout.list_chat, null);
 
@@ -88,7 +94,6 @@ public class ChatListAdapter extends ArrayAdapter{
             txtNotif.setVisibility(View.VISIBLE);
             txtNotif.setText(getTotalNotif(position)+"");
         }
-
 
         return view;
 
