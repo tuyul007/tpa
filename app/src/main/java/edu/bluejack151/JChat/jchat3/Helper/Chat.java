@@ -69,5 +69,7 @@ public class Chat {
     public void setTimeStamp(long timeStamp) {
         this.timeStamp = timeStamp;
     }
+
+
 }
 

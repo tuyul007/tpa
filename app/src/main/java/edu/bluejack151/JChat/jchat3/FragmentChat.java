@@ -49,7 +49,6 @@ public class FragmentChat extends android.support.v4.app.Fragment {
                 }else{
                     listChatView.set(idx,data.getValue());
                 }
-                System.out.println(listChatView.get(idx).getLastChat().getMessage());
                 idx++;
             }
             if(adapter!=null)adapter.notifyDataSetChanged();

@@ -75,6 +75,7 @@ public class RegisterActivity extends AppCompatActivity {
                 if (successRegister) {
                     Intent i = new Intent(getApplicationContext(), MainActivity.class);
                     startActivity(i);
+                    finish();
                 } else {
                     userAcc.put(dataSnapshot.getKey(), dataSnapshot.getValue(UserAccount.class));
 

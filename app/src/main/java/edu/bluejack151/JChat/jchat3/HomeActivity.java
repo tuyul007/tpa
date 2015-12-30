@@ -58,6 +58,8 @@ public class HomeActivity extends AppCompatActivity
     ProgressDialog progressDialog;
     Handler handler;
     TextView loadingHandler;
+    Boolean updateGroup = false,updateUser=false;
+    Chat c;
 
     public static ArrayList<ParentFriendListItem> tempFriendList;
     public static HashMap<String, ChatAdapterItem> chatList;
@@ -83,7 +85,13 @@ public class HomeActivity extends AppCompatActivity
 
         return bitmap;
     }
-
+    void setSession(UserAccount user){
+        userSessionPreferences = getSharedPreferences("user_session", MODE_PRIVATE);
+        SharedPreferences.Editor userSessionEditor = userSessionPreferences.edit();
+        String user_session = new Gson().toJson(user);
+        userSessionEditor.putString("user_session", user_session);
+        userSessionEditor.commit();
+    }
     void initStatic() {
         HomeActivity.tempFriendList = null;
         HomeActivity.friendAccountList = null;
@@ -102,9 +110,8 @@ public class HomeActivity extends AppCompatActivity
         userRef = new Firebase("https://jchatapps.firebaseio.com/user");
         chatRef = new Firebase("https://jchatapps.firebaseio.com/chat");
         groupNotifRef = new Firebase("https://jchatapps.firebaseio.com/groupnotif");
-
         updateChatHistory();
-//        groupRef.push().setva -> cara push dan isi datanya
+        checkUpdates();
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -170,32 +177,72 @@ public class HomeActivity extends AppCompatActivity
     }
 
     void updateChatHistory() {
-        chatRef.addChildEventListener(new ChildEventListener() {
+        chatRef.orderByChild("timeStamp").addChildEventListener(new ChildEventListener() {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, final String s) {
-                final Chat c = dataSnapshot.getValue(Chat.class);
-                if (!c.getGroupId().equals("")) {
-                    groupRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            if (chatList.get(c.getGroupId()) == null &&
-                                    dataSnapshot.hasChild(c.getGroupId() + "_" + userSessionAccount.getUserId())) {
-                                final ChatAdapterItem cai = new ChatAdapterItem();
-                                cai.setLastChat(c);
-                                cai.setGroup(dataSnapshot.child(c.getGroupId() + "_" + userSessionAccount.getUserId()).getValue(GroupIdentity.class));
-                                groupNotifRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            public void onChildAdded(final DataSnapshot chatSnapshot, final String s) {
+                groupRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(final DataSnapshot dataSnapshot) {
+                        groupNotifRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(final DataSnapshot notifSnapshot) {
+                                userRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
-                                    public void onDataChange(DataSnapshot dataSnapshot) {
-                                        if (dataSnapshot.getChildrenCount() != 0) {
-                                            for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                                                GroupNotif gn = ds.getValue(GroupNotif.class);
-                                                if (gn.getGroupId().equals(cai.getGroup()) && gn.getUserId().equals(userSessionAccount.getUserId()))
-                                                    cai.setNotifCount(cai.getNotifCount() + 1);
+                                    public void onDataChange(final DataSnapshot userSnapshot) {
+                                        friendRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(DataSnapshot friendSnapshot) {
+                                                final Chat c = chatSnapshot.getValue(Chat.class);
+                                                if (!c.getGroupId().equals("")) {
+                                                    if (chatList.get(c.getGroupId()) == null &&
+                                                            dataSnapshot.hasChild(c.getGroupId() + "_" + userSessionAccount.getUserId())) {
+                                                        final ChatAdapterItem cai = new ChatAdapterItem();
+                                                        cai.setLastChat(c);
+                                                        cai.setGroup(dataSnapshot.child(c.getGroupId() + "_" + userSessionAccount.getUserId()).getValue(GroupIdentity.class));
+                                                        if (notifSnapshot.getChildrenCount() != 0) {
+                                                            for (DataSnapshot ds : notifSnapshot.getChildren()) {
+                                                                GroupNotif gn = ds.getValue(GroupNotif.class);
+                                                                if (gn.getGroupId().equals(cai.getGroup()) && gn.getUserId().equals(userSessionAccount.getUserId()))
+                                                                    cai.setNotifCount(cai.getNotifCount() + 1);
+                                                            }
+                                                        }
+                                                        chatList.put(c.getGroupId(), cai);
+                                                        FragmentChat.updateView();
+                                                    } else if (dataSnapshot.hasChild(c.getGroupId() + "_" + userSessionAccount.getUserId())) {
+                                                        chatList.get(c.getGroupId()).setLastChat(c);
+                                                        FragmentChat.updateView();
+                                                    }
+                                                } else {
+                                                    if (c.getToId().equals(userSessionAccount.getUserId())) {
+                                                        if (chatList.get(c.getFromId()) == null) {
+                                                            chatList.put(c.getFromId(), new ChatAdapterItem());
+                                                            chatList.get(c.getFromId()).setUser(userSnapshot.child(c.getFromId()).getValue(UserAccount.class));
+                                                        }
+                                                        if (dataSnapshot.hasChild(userSessionAccount.getUserId() + "_" + c.getToId())) {
+                                                            Friend f = dataSnapshot.child(userSessionAccount.getUserId() + "_" + c.getToId()).getValue(Friend.class);
+                                                            if (f.getBlocked() == 0) {
+                                                                chatList.get(c.getFromId()).setLastChat(c);
+                                                                if (c.getPrivateStatus() == 0) {
+                                                                    chatList.get(c.getFromId()).setNotifCount(chatList.get(c.getFromId()).getNotifCount() + 1);
+                                                                }
+                                                                FragmentChat.updateView();
+                                                            }
+                                                            return;
+                                                        }
+                                                        chatList.get(c.getFromId()).setLastChat(c);
+                                                        if (c.getPrivateStatus() == 0) {
+                                                            chatList.get(c.getFromId()).setNotifCount(chatList.get(c.getFromId()).getNotifCount() + 1);
+                                                        }
+                                                        FragmentChat.updateView();
+                                                    }
+                                                }
                                             }
-                                        }
 
-                                        chatList.put(c.getGroupId(), cai);
-                                        FragmentChat.updateView();
+                                            @Override
+                                            public void onCancelled(FirebaseError firebaseError) {
+
+                                            }
+                                        });
                                     }
 
                                     @Override
@@ -203,40 +250,22 @@ public class HomeActivity extends AppCompatActivity
 
                                     }
                                 });
-                            } else if (dataSnapshot.hasChild(c.getGroupId() + "_" + userSessionAccount.getUserId())) {
-                                chatList.get(c.getGroupId()).setLastChat(c);
-                                FragmentChat.updateView();
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(FirebaseError firebaseError) {
-
-                        }
-                    });
-                } else {
-                    if (c.getToId().equals(userSessionAccount.getUserId())) {
-                        if (chatList.get(c.getFromId()) == null) {
-                            chatList.put(c.getFromId(), new ChatAdapterItem());
-                        }
-                        chatList.get(c.getFromId()).setLastChat(c);
-                        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                chatList.get(c.getFromId()).setUser(dataSnapshot.child(c.getFromId()).getValue(UserAccount.class));
-                                if (c.getPrivateStatus() == 0)
-                                    chatList.get(c.getFromId()).setNotifCount(chatList.get(c.getFromId()).getNotifCount() + 1);
-                                FragmentChat.updateView();
                             }
 
                             @Override
                             public void onCancelled(FirebaseError firebaseError) {
+
                             }
                         });
 
                     }
 
-                }
+                    @Override
+                    public void onCancelled(FirebaseError firebaseError) {
+
+                    }
+                });
+
             }
 
             @Override
@@ -266,8 +295,6 @@ public class HomeActivity extends AppCompatActivity
         userSessionAccount = new Gson().fromJson(userSessionPreferences.getString("user_session", ""), UserAccount.class);
         loadingHandler = (TextView) findViewById(R.id.loadingHandler);
         loadingHandler.setText("");
-
-        toastMsg(userSessionAccount.getEmail()+" "+userSessionAccount.getUserId()+" "+userSessionAccount.getDisplayName());
         ready = false;
 
         tempFriendList = new ArrayList<>();
@@ -280,8 +307,8 @@ public class HomeActivity extends AppCompatActivity
         tempFriendList.get(0).setGroupViewName("Groups");
         tempFriendList.get(1).setGroupViewName("Friends");
 
-
         initDatabase();
+
         loadingHandler.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -300,7 +327,7 @@ public class HomeActivity extends AppCompatActivity
                         && userSessionAccount.getTotalGroup() == groupCount
                         ) {
                     selectAllFriend();
-                    checkUpdates();
+                    updateGroup = updateUser = true;
                     setLayout();
                     ready = true;
                     Toast.makeText(getApplicationContext(), "Welcome," + userSessionAccount.getDisplayName(), Toast.LENGTH_SHORT).show();
@@ -322,14 +349,13 @@ public class HomeActivity extends AppCompatActivity
     }
 
     void checkUpdates() {
-        groupRef.addValueEventListener(new ValueEventListener() {
+        groupRef.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (totalGroup < dataSnapshot.getChildrenCount()) {
-                    GroupIdentity g = null;
-                    for (DataSnapshot ds : dataSnapshot.getChildren())
-                        g = ds.getValue(GroupIdentity.class);
-                    if (g.getUserId().equals(HomeActivity.userSessionAccount.getUserId())) {
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                if(!updateGroup)return;
+                GroupIdentity g = null;
+                g = dataSnapshot.getValue(GroupIdentity.class);
+                if (g.getUserId().equals(HomeActivity.userSessionAccount.getUserId())) {
                         HomeActivity.tempFriendList.get(FragmentFriend.GROUP).getFriendList().add(new FriendListItem());
                         HomeActivity.tempFriendList.get(FragmentFriend.GROUP).getFriendList().get(
                                 HomeActivity.tempFriendList.get(FragmentFriend.GROUP).getFriendList().size() - 1
@@ -337,8 +363,22 @@ public class HomeActivity extends AppCompatActivity
 
                         FragmentFriend.adapter.setFriendAndGroupList(tempFriendList);
                         FragmentFriend.adapter.notifyDataSetChanged();
-                    }
                 }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
             }
 
             @Override
@@ -349,13 +389,15 @@ public class HomeActivity extends AppCompatActivity
         userRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                if(!updateUser)return;
                 if (friendAccountList.get(dataSnapshot.getKey()) == null)
                     friendAccountList.put(dataSnapshot.getKey(), dataSnapshot.getValue(UserAccount.class));
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
+                if(dataSnapshot.getValue(UserAccount.class).getUserId().equals(userSessionAccount.getUserId()))
+                    setSession(dataSnapshot.getValue(UserAccount.class));
             }
 
             @Override
