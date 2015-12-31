@@ -114,77 +114,64 @@ public class MainActivity extends Activity {
     {
         Intent intent=new Intent(this,RegisterActivity.class);
         startActivity(intent);
-
+        finish();
     }
 
     Firebase uploadedImageTesRef;
+    String message="";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-
         super.onCreate(savedInstanceState);
+
         Firebase.setAndroidContext(this);
         FacebookSdk.sdkInitialize(getApplicationContext());
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
 
-        //                    Intent i = new Intent(getApplicationContext(),HomeActivity.class);
-
-//        Intent toGambar=new Intent(getApplicationContext(),GambarDafuq.class);
-
-//        startActivity(toGambar);
-
         editor = getSharedPreferences(preferencesName, MODE_PRIVATE).edit();
-
-//        this.setTitle("EHM"); ->ganti title
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true); ->munculin back button di title
-
-
         initComponent();
-
         userRef = new Firebase("https://jchatapps.firebaseio.com/user");
-
-        //manual-login
-
-
-
-        manualLoginButton.setOnClickListener(new View.OnClickListener() {
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onClick(View v) {
-                userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            public void onDataChange(final DataSnapshot dataSnapshot) {
+                //manual-login
+                manualLoginButton.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        String message = "";
+                    public void onClick(View v) {
+                        message = "";
                         if (email.getText().toString().equals("") || password.getText().toString().equals("")) {
                             message = "All field must be filled";
                         } else {
                             message = "Invalid username/password";
-                            for(DataSnapshot ds : dataSnapshot.getChildren()){
-                                if(ds.getValue(UserAccount.class).getEmail().equals(email.getText().toString())
-                                    && ds.getValue(UserAccount.class).getPassword().equals(password.getText().toString())){
-                                    loginAccount =  ds.getValue(UserAccount.class);
-                                    message = "Login Success";break;
+                            for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                                if (ds.getValue(UserAccount.class).getEmail().equals(email.getText().toString())
+                                        && ds.getValue(UserAccount.class).getPassword().equals(password.getText().toString())) {
+                                    loginAccount = ds.getValue(UserAccount.class);
+                                    message = "Login Success";
+                                    break;
                                 }
                             }
                         }
-                        if(message.equals("Login Success")){
+
+                        if (message.equals("Login Success")) {
                             setSession(loginAccount);
                             Intent i = new Intent(getApplicationContext(), HomeActivity.class);
                             startActivity(i);
                             finish();
-                        }else {
+                        } else {
                             Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
                         }
-                    }
-
-                    @Override
-                    public void onCancelled(FirebaseError firebaseError) {
 
                     }
                 });
             }
-        });
 
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
         //facebook - login
         pageLoginFacebook =new Intent(this,HomeActivity.class);
         callbackManager = CallbackManager.Factory.create();

@@ -5,10 +5,13 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +20,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -226,8 +230,7 @@ public class FragmentFriend  extends android.support.v4.app.Fragment{
                     if(HomeActivity.chatList.get(fl.getFriendDetail().getUserId())==null) {
                         PrivateChatActivity.listChat = new ChatListItem();
                         PrivateChatActivity.listChat.setUser(fl.getFriendDetail());
-                    }else
-                        PrivateChatActivity.listChat =HomeActivity.chatList.get(fl.getFriendDetail().getUserId());
+                    }
 
                     Intent i = new Intent(getActivity(),PrivateChatActivity.class);
                     startActivity(i);
@@ -238,10 +241,13 @@ public class FragmentFriend  extends android.support.v4.app.Fragment{
             popUpMenu2.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(fl.getFriendIdentity().getBlocked() == 1)
+                    if(fl.getFriendIdentity().getBlocked() == 1) {
                         fl.getFriendIdentity().setBlocked(0);
-                    else
+                    }else {
                         fl.getFriendIdentity().setBlocked(1);
+                        HomeActivity.chatList.remove(fl.getFriendDetail().getUserId());
+                        FragmentChat.updateView();
+                    }
 
                     friendRef.child(HomeActivity.userSessionAccount.getUserId() + "_" +
                             fl.getFriendIdentity().getFriendId()).setValue(fl.getFriendIdentity());
@@ -272,7 +278,15 @@ public class FragmentFriend  extends android.support.v4.app.Fragment{
             this.context=context;
             this.friendAndGroupList = list;
         }
-
+        UserAccount getUser(int i,int i1){
+            return friendAndGroupList.get(i).getFriendList().get(i1).getFriendDetail();
+        }
+        GroupIdentity getGroup(int i,int i1){
+            return friendAndGroupList.get(i).getFriendList().get(i1).getGroupIdentity();
+        }
+        Friend getFriend(int i,int i1){
+            return friendAndGroupList.get(i).getFriendList().get(i1).getFriendIdentity();
+        }
         @Override
         public int getGroupCount() {
             return friendAndGroupList.size();
@@ -332,22 +346,30 @@ public class FragmentFriend  extends android.support.v4.app.Fragment{
         @Override
         public View getChildView(int i, int i1, boolean b, View view, ViewGroup viewGroup) {
             String headerTitle = "";
-            if(friendAndGroupList.get(i).getGroupViewName().equals("Friends")){
-                headerTitle = friendAndGroupList.get(i).getFriendList().get(i1).getFriendDetail()
-                        .getDisplayName();
-                if(friendAndGroupList.get(i).getFriendList().get(i1).getFriendIdentity().getBlocked() == 1)
-                    headerTitle+= " (blocked)";
-            }else{
-                headerTitle = friendAndGroupList.get(i).getFriendList().get(i1).getGroupIdentity()
-                        .getGroupName();
-
-                if(friendAndGroupList.get(i).getFriendList().get(i1).getGroupIdentity().getAccept() == 0)
-                    headerTitle+= " (invited)";
-            }
             if (view == null) {
                 LayoutInflater infalInflater = (LayoutInflater) this.context
                         .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 view = infalInflater.inflate(R.layout.list_friend_item, null);
+            }
+            ImageView img = (ImageView) view.findViewById(R.id.imageView);
+
+            if(friendAndGroupList.get(i).getGroupViewName().equals("Friends")){
+                headerTitle = getUser(i,i1).getDisplayName();
+
+                if(!getUser(i,i1).getProfilePicture().equals("")) {
+                    byte[] imageAsBytes = Base64.decode(
+                            getUser(i, i1).getProfilePicture()
+                            , Base64.DEFAULT);
+                    Bitmap bmp = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
+                    img.setImageBitmap(bmp);
+                }
+                if(getFriend(i,i1).getBlocked() == 1)
+                    headerTitle+= " (blocked)";
+            }else{
+                headerTitle = getGroup(i,i1).getGroupName();
+
+                if(getGroup(i,i1).getAccept() == 0)
+                    headerTitle+= " (invited)";
             }
 
             TextView lblListHeader = (TextView) view.findViewById(R.id.itemFriend);

@@ -64,63 +64,65 @@ public class RegisterActivity extends AppCompatActivity {
 
         final Firebase userRef = new Firebase("https://jchatapps.firebaseio.com/user");
 
-        btnSubmit.setOnClickListener(new View.OnClickListener() {
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onClick(View v) {
-                userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            public void onDataChange(final DataSnapshot dataSnapshot) {
+                btnSubmit.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
+                    public void onClick(View v) {
                         message = "";
                         if (!Validator.checkUserID(userId.getText().toString())) {
                             message = "User ID must be alphabet or numeric, 6-8 character";
+                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
                         } else if (!Validator.checkLength(displayName.getText().toString(), 3, 20) ||
                                 !Validator.isAlpha(displayName.getText().toString())) {
                             message = "Display Name must be alphabet, 3-20 character";
                         } else if (!Validator.validateEmail(email.getText())) {
                             message = "Email format is wrong";
+                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
                         } else if (!Validator.checkLength(password.getText().toString(), 4, 20)
                                 || !Validator.isAlphaNumeric(password.getText().toString())) {
                             message = "Password must be alphanumeric, 4-20 character";
+                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
                         } else {
-                            message = "Register Success";
-                            for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                                if (ds.getValue(UserAccount.class).getUserId().equals(userId.getText().toString())) {
-                                    message = "User ID has already used";
-                                    break;
-                                }
-                            }
+                                    message = "Register Success";
+                                    if (dataSnapshot.hasChild(userId.getText().toString())) {
+                                        message = "User ID has already used";
+                                    }
+
+                                    Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                                    if (message.equals("Register Success")) {
+                                        //insertDatabase
+                                        String gender = "Male";
+                                        if (radioFemale.isChecked()) gender = "Female";
+
+                                        userRef.child(userId.getText().toString())
+                                                .setValue(new UserAccount(
+                                                        userId.getText().toString(),
+                                                        displayName.getText().toString(),
+                                                        email.getText().toString(),
+                                                        password.getText().toString(),
+                                                        gender,
+                                                        "",
+                                                        1,
+                                                        1,
+                                                        0,
+                                                        0
+                                                ));
+                                        Intent i = new Intent(getApplicationContext(),MainActivity.class);
+                                        startActivity(i);
+                                        finish();
+                                    }
+
                         }
-                        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-                        if (message.equals("Register Success")) {
-                            //insertDatabase
-                            String gender = "Male";
-                            if (radioFemale.isChecked()) gender = "Female";
-
-                            userRef.child(userId.getText().toString())
-                                    .setValue(new UserAccount(
-                                            userId.getText().toString(),
-                                            displayName.getText().toString(),
-                                            email.getText().toString(),
-                                            password.getText().toString(),
-                                            gender,
-                                            "",
-                                            1,
-                                            1,
-                                            0,
-                                            0
-                                    ));
-                            finish();
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(FirebaseError firebaseError) {
-
                     }
                 });
             }
-        });
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
 
+            }
+        });
         btnReset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -134,5 +136,11 @@ public class RegisterActivity extends AppCompatActivity {
         });
     }
 
-
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent i = new Intent(getApplicationContext(),MainActivity.class);
+        startActivity(i);
+        finish();
+    }
 }

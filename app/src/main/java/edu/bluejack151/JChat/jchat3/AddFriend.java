@@ -68,6 +68,10 @@ public class AddFriend extends AppCompatActivity {
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 if (dataSnapshot.hasChild(fieldSearchFriend.getText().toString())) {
                                     final UserAccount a = dataSnapshot.child(fieldSearchFriend.getText().toString()).getValue(UserAccount.class);
+                                    if(a.getIsPublic() == 0){
+                                        Toast.makeText(getApplicationContext(), "User ID not found", Toast.LENGTH_SHORT).show();
+                                        return;
+                                    }
                                     if (a.getUserId().equals(fieldSearchFriend.getText().toString())) {
                                         for (int i = 0; i < HomeActivity.tempFriendList.get(1).getFriendList().size(); i++) {
                                             Friend f = HomeActivity.tempFriendList.get(1).getFriendList().get(i).getFriendIdentity();

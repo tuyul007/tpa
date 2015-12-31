@@ -43,37 +43,12 @@ public class FragmentChat extends android.support.v4.app.Fragment {
         lv.setAdapter(adapter);
 
     }
-    public static void updateUserNotifCount(String targetId,int count){
-        int idx = 0;
-        for(int i=0; i<listChatView.size(); i++){
-            Chat c = listChatView.get(i).getLastChat();
-            if((c.getFromId().equals(targetId) && c.getToId().equals(HomeActivity.userSessionAccount.getUserId()))
-                    || (c.getFromId().equals(HomeActivity.userSessionAccount.getUserId()) && c.getToId().equals(targetId))){
-                listChatView.get(i).setNotifCount(count);
-                break;
-            }
-        }
-        adapter.notifyDataSetChanged();
-
-    }
     public static void updateView(){
         if(listChatView!=null) {
             int idx = 0;
-            for (Map.Entry<String, ChatListItem> data : HomeActivity.chatList.entrySet()) {
-                if(listChatView.size()-1<idx || listChatView.size()==0){
-                    listChatView.add(new ChatAdapterItem());
-                    listChatView.get(listChatView.size()-1).setNotifCount(data.getValue().getNotifCount());
-                    listChatView.get(listChatView.size()-1).setUser(data.getValue().getUser());
-                    listChatView.get(listChatView.size()-1).setGroup(data.getValue().getGroup());
-                    listChatView.get(listChatView.size()-1).setLastChat(data.getValue().getLastChat());
-
-                }else{
-                    listChatView.get(idx).setNotifCount(data.getValue().getNotifCount());
-                    listChatView.get(idx).setUser(data.getValue().getUser());
-                    listChatView.get(idx).setGroup(data.getValue().getGroup());
-                    listChatView.get(idx).setLastChat(data.getValue().getLastChat());
-                }
-                idx++;
+            listChatView.clear();
+            for (Map.Entry<String, ChatAdapterItem> data : HomeActivity.chatList.entrySet()) {
+                listChatView.add(data.getValue());
             }
             if(adapter!=null)adapter.notifyDataSetChanged();
         }
@@ -90,14 +65,13 @@ public class FragmentChat extends android.support.v4.app.Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (listChatView.get(position).getGroup() == null) {
                     UserAccount target = listChatView.get(position).getUser();
-                    if (HomeActivity.chatList.get(target.getUserId()) == null) {
-                        PrivateChatActivity.listChat = new ChatListItem();
-                        PrivateChatActivity.listChat.setUser(target);
-                    } else
-                        PrivateChatActivity.listChat = HomeActivity.chatList.get(target.getUserId());
+                    PrivateChatActivity.listChat = new ChatListItem();
+                    PrivateChatActivity.listChat.setUser(target);
 
                     Intent i = new Intent(getContext(), PrivateChatActivity.class);
                     startActivity(i);
+                } else {
+                    //group chat
                 }
             }
         });

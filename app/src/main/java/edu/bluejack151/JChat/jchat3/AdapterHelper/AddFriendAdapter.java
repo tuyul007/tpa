@@ -67,7 +67,7 @@ public class AddFriendAdapter  extends ArrayAdapter{
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        AddFriend.friendRef.child(HomeActivity.userSessionAccount.getUserId() + "_" + userAccounts.get(position).getUserId()).setValue(
+                        HomeActivity.friendRef.child(HomeActivity.userSessionAccount.getUserId() + "_" + userAccounts.get(position).getUserId()).setValue(
                                 new Friend(userAccounts.get(position).getUserId(),HomeActivity.userSessionAccount.getUserId(),0)
                         );
                         HomeActivity.tempFriendList.get(1).getFriendList().add(new FriendListItem());
@@ -76,9 +76,10 @@ public class AddFriendAdapter  extends ArrayAdapter{
                         ).setFriendIdentity(new Friend(userAccounts.get(position).getUserId(), HomeActivity.userSessionAccount.getUserId(), 0));
                         HomeActivity.tempFriendList.get(1).getFriendList().get(
                                 HomeActivity.tempFriendList.get(1).getFriendList().size() - 1
-                        ).setFriendDetail(userAccounts.get(position));;
+                        ).setFriendDetail(userAccounts.get(position));
+
                         HomeActivity.userSessionAccount.setTotalFriend((HomeActivity.userSessionAccount.getTotalFriend() + 1));
-                        AddFriend.userRef.child(HomeActivity.userSessionAccount.getUserId()).setValue(HomeActivity.userSessionAccount);
+                        HomeActivity.userRef.child(HomeActivity.userSessionAccount.getUserId()).setValue(HomeActivity.userSessionAccount);
 
                         FragmentFriend.adapter.setFriendAndGroupList(HomeActivity.tempFriendList);
                         FragmentFriend.adapter.notifyDataSetChanged();

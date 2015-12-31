@@ -21,15 +21,16 @@ import java.util.List;
 import edu.bluejack151.JChat.jchat3.AdapterHelper.ChatListItem;
 import edu.bluejack151.JChat.jchat3.AdapterHelper.ChatViewAdapter;
 import edu.bluejack151.JChat.jchat3.Helper.Chat;
+import edu.bluejack151.JChat.jchat3.Helper.Friend;
 
 public class PrivateChatActivity extends AppCompatActivity {
 
     public static ChatListItem listChat;
-    public static Boolean isActive = false;
     public static ChatViewAdapter adapter;
     Button btnSend ;
     ListView listView;
     EditText fieldMsg ;
+    public static Boolean set = false;
 
     void initComponent(){
         btnSend = (Button)findViewById(R.id.button);
@@ -40,63 +41,77 @@ public class PrivateChatActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        HomeActivity.chatRef.orderByChild("timeStamp").addListenerForSingleValueEvent(new ValueEventListener() {
+        setContentView(R.layout.activity_private_chat);
+        HomeActivity.chatRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                    setContentView(R.layout.activity_private_chat);
-                    initComponent();
-                    setTitle(listChat.getUser().getDisplayName());
-                    listChat.setListChat(new ArrayList<Chat>());
-                    HomeActivity.chatRef.child("IN_" + HomeActivity.userSessionAccount.getUserId() + "_" + listChat.getUser().getUserId())
-                            .setValue(new Chat(HomeActivity.userSessionAccount.getUserId()
-                                    , listChat.getUser().getUserId()
-                                    , "", 0, "", 0));
-                    if(HomeActivity.chatList.get(listChat.getUser().getUserId())!=null) {
-                        HomeActivity.chatList.get(listChat.getUser().getUserId()).setNotifCount(0);
-                        FragmentChat.updateUserNotifCount(listChat.getUser().getUserId(),0);
-                        for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                            Chat c = ds.getValue(Chat.class);
-                            if(!c.getMessage().equals(""))
-                            if ((c.getFromId().equals(listChat.getUser().getUserId()) && c.getToId().equals(HomeActivity.userSessionAccount.getUserId()))
-                                    || (c.getFromId().equals(HomeActivity.userSessionAccount.getUserId()) && c.getToId().equals(listChat.getUser().getUserId()))) {
-                                if(!c.getFromId().equals(HomeActivity.userSessionAccount.getUserId()))
-                                    c.setPrivateStatus(1);
-
-                                listChat.setLastChat(c);
-                                HomeActivity.chatRef.child(ds.getKey()).setValue(c);
-                            }
-                        }
-                    }
-                    adapter = new ChatViewAdapter(getApplicationContext(),listChat.getListChat(),listChat.getUser());
-                    listView.setAdapter(adapter);
-                    isActive = true;
-
-                    btnSend.setOnClickListener(new View.OnClickListener() {
+            public void onDataChange(final DataSnapshot dataSnapshot) {
+                    HomeActivity.friendRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
-                        public void onClick(View v) {
-                            if(fieldMsg.getText().toString().length()>0){
-                                HomeActivity.chatRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot dataSnapshot) {
-                                        Chat c = new Chat(HomeActivity.userSessionAccount.getUserId(),
-                                                listChat.getUser().getUserId(),
-                                                "",
-                                                0,
-                                                fieldMsg.getText().toString(),
-                                                new Date().getTime());
-                                        if(dataSnapshot.hasChild("IN_" +listChat.getUser().getUserId() + "_" + HomeActivity.userSessionAccount.getUserId() )){
-                                            c.setPrivateStatus(1);
+                        public void onDataChange(DataSnapshot friendSnapshot) {
+                            initComponent();
+                            setTitle(listChat.getUser().getDisplayName());
+                            listChat.setListChat(new ArrayList<Chat>());
+                            HomeActivity.chatRef.child("IN_" + HomeActivity.userSessionAccount.getUserId() + "_" + listChat.getUser().getUserId())
+                                    .setValue(new Chat(HomeActivity.userSessionAccount.getUserId()
+                                            , listChat.getUser().getUserId()
+                                            , "", 0, "", 0));
+                            if(HomeActivity.chatList.get(listChat.getUser().getUserId())!=null) {
+                                if(friendSnapshot.hasChild(HomeActivity.userSessionAccount.getUserId()+"_"+listChat.getUser().getUserId()));
+                                HomeActivity.chatList.get(listChat.getUser().getUserId()).setNotifCount(0);
+                                FragmentChat.updateView();
+                                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                                    Chat c = ds.getValue(Chat.class);
+                                    if(!c.getMessage().equals(""))
+                                        if ((c.getFromId().equals(listChat.getUser().getUserId()) && c.getToId().equals(HomeActivity.userSessionAccount.getUserId()))
+                                                || (c.getFromId().equals(HomeActivity.userSessionAccount.getUserId()) && c.getToId().equals(listChat.getUser().getUserId()))) {
+                                            if(!c.getFromId().equals(HomeActivity.userSessionAccount.getUserId()))
+                                                c.setPrivateStatus(1);
+
+                                            listChat.setLastChat(c);
+                                            HomeActivity.chatRef.child(ds.getKey()).child("privateStatus").setValue(c.getPrivateStatus());
                                         }
-                                        HomeActivity.chatRef.push().setValue(c);
-                                        fieldMsg.setText("");
-                                    }
-
-                                    @Override
-                                    public void onCancelled(FirebaseError firebaseError) {
-
-                                    }
-                                });
+                                }
                             }
+                            adapter = new ChatViewAdapter(getApplicationContext(),listChat.getListChat(),listChat.getUser());
+                            listView.setAdapter(adapter);
+                            set = true;
+
+                            btnSend.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    if(fieldMsg.getText().toString().length()>0){
+                                        HomeActivity.chatRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                                Chat c = new Chat(HomeActivity.userSessionAccount.getUserId(),
+                                                        listChat.getUser().getUserId(),
+                                                        "",
+                                                        0,
+                                                        fieldMsg.getText().toString(),
+                                                        new Date().getTime());
+                                                if(dataSnapshot.hasChild("IN_" +listChat.getUser().getUserId() + "_" + HomeActivity.userSessionAccount.getUserId() )){
+                                                    c.setPrivateStatus(1);
+                                                }
+                                                listChat.setLastChat(c);
+                                                adapter.notifyDataSetChanged();
+
+                                                HomeActivity.chatRef.child(c.getTimeStamp()+"").setValue(c);
+                                                fieldMsg.setText("");
+                                            }
+
+                                            @Override
+                                            public void onCancelled(FirebaseError firebaseError) {
+
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onCancelled(FirebaseError firebaseError) {
+
                         }
                     });
                 }
@@ -115,7 +130,7 @@ public class PrivateChatActivity extends AppCompatActivity {
         super.onBackPressed();
         HomeActivity.chatRef.child("IN_" + HomeActivity.userSessionAccount.getUserId() + "_" + listChat.getUser().getUserId())
                 .removeValue();
-        isActive = false;
+        set = false;
         finish();
     }
 }
