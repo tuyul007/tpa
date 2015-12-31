@@ -226,28 +226,31 @@ public class HomeActivity extends AppCompatActivity
                                                                 if (f.getBlocked() == 0) {
                                                                     chatList.get(friendId).setLastChat(c);
                                                                     if (!c.getFromId().equals(userSessionAccount.getUserId()) && c.getPrivateStatus() == 0) {
-                                                                        toastMsg(chatList.get(friendId).getNotifCount()+"");
                                                                         chatList.get(friendId).setNotifCount(chatList.get(friendId).getNotifCount() + 1);
                                                                     }
+                                                                    FragmentChat.updateView();
                                                                     if(!c.getFromId().equals(HomeActivity.userSessionAccount.getUserId())&& PrivateChatActivity.set){
                                                                         PrivateChatActivity.listChat.setLastChat(c);
                                                                         PrivateChatActivity.adapter.notifyDataSetChanged();
                                                                     }
                                                                 } else {
                                                                     chatList.remove(friendId);
+                                                                    FragmentChat.updateView();
+
                                                                 }
-                                                                FragmentChat.updateView();
                                                                 return;
                                                             }
                                                             chatList.get(friendId).setLastChat(c);
                                                             if (!c.getFromId().equals(userSessionAccount.getUserId()) && c.getPrivateStatus() == 0) {
                                                                 chatList.get(friendId).setNotifCount(chatList.get(friendId).getNotifCount() + 1);
                                                             }
+
                                                             FragmentChat.updateView();
                                                             if(!c.getFromId().equals(HomeActivity.userSessionAccount.getUserId())&& PrivateChatActivity.set){
                                                                 PrivateChatActivity.listChat.setLastChat(c);
                                                                 PrivateChatActivity.adapter.notifyDataSetChanged();
                                                             }
+
                                                         }
                                                     }
                                                 }

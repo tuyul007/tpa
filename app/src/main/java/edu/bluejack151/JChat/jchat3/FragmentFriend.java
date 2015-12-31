@@ -227,10 +227,8 @@ public class FragmentFriend  extends android.support.v4.app.Fragment{
                 @Override
                 public void onClick(View v) {
                     //chat
-                    if(HomeActivity.chatList.get(fl.getFriendDetail().getUserId())==null) {
-                        PrivateChatActivity.listChat = new ChatListItem();
-                        PrivateChatActivity.listChat.setUser(fl.getFriendDetail());
-                    }
+                    PrivateChatActivity.listChat = new ChatListItem();
+                    PrivateChatActivity.listChat.setUser(fl.getFriendDetail());
 
                     Intent i = new Intent(getActivity(),PrivateChatActivity.class);
                     startActivity(i);
