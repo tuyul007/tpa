@@ -226,6 +226,7 @@ public class HomeActivity extends AppCompatActivity
                                                                 if (f.getBlocked() == 0) {
                                                                     chatList.get(friendId).setLastChat(c);
                                                                     if (!c.getFromId().equals(userSessionAccount.getUserId()) && c.getPrivateStatus() == 0) {
+                                                                        //fire event
                                                                         chatList.get(friendId).setNotifCount(chatList.get(friendId).getNotifCount() + 1);
                                                                     }
                                                                     FragmentChat.updateView();

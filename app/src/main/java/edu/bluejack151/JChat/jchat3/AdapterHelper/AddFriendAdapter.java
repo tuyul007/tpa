@@ -3,6 +3,9 @@ package edu.bluejack151.JChat.jchat3.AdapterHelper;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,11 +58,13 @@ public class AddFriendAdapter  extends ArrayAdapter{
         TextView txtNameSearch = (TextView) newView.findViewById(R.id.friendNameSearch);
 
         ImageView profileSearch = (ImageView) newView.findViewById(R.id.profileSearchPicture);
-
         txtNameSearch.setText(getData(position).getDisplayName().toString());
 
         if(!getData(position).getProfilePicture().equals("")){
-            //change profile pict
+            byte[] imageAsBytes = Base64.decode(getData(position).getProfilePicture(), Base64.DEFAULT);
+            //Toast.makeText(AddFriendAdapter.this, getData(position).getProfilePicture(), Toast.LENGTH_SHORT).show();
+            Bitmap bitmap = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
+            profileSearch.setImageBitmap(bitmap);
         }
 
         ImageButton btn = (ImageButton)newView.findViewById(R.id.btnAdd);

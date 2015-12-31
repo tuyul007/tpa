@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.shiperus.ark.jchat3.R;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 
 import edu.bluejack151.JChat.jchat3.AdapterHelper.ChatAdapterItem;
@@ -45,12 +46,14 @@ public class FragmentChat extends android.support.v4.app.Fragment {
     }
     public static void updateView(){
         if(listChatView!=null) {
-            int idx = 0;
             listChatView.clear();
             for (Map.Entry<String, ChatAdapterItem> data : HomeActivity.chatList.entrySet()) {
+                System.out.println(data.getKey());
                 listChatView.add(data.getValue());
             }
-            if(adapter!=null)adapter.notifyDataSetChanged();
+            if(adapter!=null){
+                adapter.notifyDataSetChanged();
+            }
         }
     }
 
