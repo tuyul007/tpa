@@ -23,6 +23,7 @@ import edu.bluejack151.JChat.jchat3.AdapterHelper.ChatAdapterItem;
 import edu.bluejack151.JChat.jchat3.AdapterHelper.ChatListAdapter;
 import edu.bluejack151.JChat.jchat3.AdapterHelper.ChatListItem;
 import edu.bluejack151.JChat.jchat3.Helper.Chat;
+import edu.bluejack151.JChat.jchat3.Helper.GroupIdentity;
 import edu.bluejack151.JChat.jchat3.Helper.UserAccount;
 
 /**
@@ -96,7 +97,12 @@ public class FragmentChat extends android.support.v4.app.Fragment {
                     Intent i = new Intent(getContext(), PrivateChatActivity.class);
                     startActivity(i);
                 } else {
-                    //group chat
+                    GroupIdentity target = listChatView.get(position).getGroup();
+                    GroupChatActivity.listChat = new ChatListItem();
+                    GroupChatActivity.listChat.setGroup(target);
+
+                    Intent i = new Intent(getContext(),GroupChatActivity.class);
+                    startActivity(i);
                 }
             }
         });
