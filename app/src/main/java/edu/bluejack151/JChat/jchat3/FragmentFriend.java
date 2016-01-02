@@ -374,7 +374,7 @@ public class FragmentFriend  extends android.support.v4.app.Fragment{
                 }
                 if(getFriend(i,i1).getBlocked() == 1)
                     headerTitle+= " (blocked)";
-            }else{
+            }else if (friendAndGroupList.get(i).getGroupViewName().equals("Groups")){
                 headerTitle = getGroup(i,i1).getGroupName();
 
                 if(getGroup(i,i1).getAccept() == 0)

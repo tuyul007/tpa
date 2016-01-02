@@ -78,7 +78,7 @@ public class ChatListAdapter extends ArrayAdapter{
         TextView txtNotif = (TextView) view.findViewById(R.id.chatNotifCount);
         ImageView profileChat = (ImageView) view.findViewById(R.id.profileSenderChat); //kaming sun
 
-        if(chatIdentiyList.get(position).getGroup() == null){
+        if(getUserAccount(position)!=null){
             //private chat
             txtFromName.setText(getUserAccount(position).getDisplayName());
 

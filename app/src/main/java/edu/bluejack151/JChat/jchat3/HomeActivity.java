@@ -400,8 +400,24 @@ public class HomeActivity extends AppCompatActivity
             }
 
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            public void onChildChanged(final DataSnapshot dataSnapshot, String s) {
+                userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot userSnapshot) {
+                        if(GroupChatActivity.set){
+                            GroupIdentity g = dataSnapshot.getValue(GroupIdentity.class);
+                            if(g.getGroupId().equals(GroupChatActivity.listChat.getGroup().getGroupId())
+                                    && g.getAccept() == 1){
+                                GroupChatActivity.groupMember.put(g.getUserId(),userSnapshot.child(g.getUserId()).getValue(UserAccount.class));
+                                GroupChatActivity.adapter.notifyDataSetChanged();
+                            }
+                        }
+                    }
+                    @Override
+                    public void onCancelled(FirebaseError firebaseError) {
 
+                    }
+                });
             }
 
             @Override
