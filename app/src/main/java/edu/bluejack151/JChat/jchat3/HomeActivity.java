@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
@@ -15,10 +16,13 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,8 +38,11 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.zip.Inflater;
 
 import android.support.design.widget.TabLayout;
+
+import org.w3c.dom.Text;
 
 import edu.bluejack151.JChat.jchat3.AdapterHelper.ChatAdapterItem;
 import edu.bluejack151.JChat.jchat3.AdapterHelper.ChatListItem;
@@ -431,7 +438,7 @@ public class HomeActivity extends AppCompatActivity
     }
 
     static Toolbar toolbar;
-
+    RoundImage roundImage;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         shrd = getSharedPreferences(MainActivity.preferencesName, Context.MODE_PRIVATE);
@@ -441,7 +448,14 @@ public class HomeActivity extends AppCompatActivity
         setContentView(R.layout.loading);
 
 
+
+
         initComponent();
+
+
+//        txtNavEmail.setText(userSessionAccount.getEmail());
+
+
     }
 
     void setLayout() {
@@ -461,6 +475,8 @@ public class HomeActivity extends AppCompatActivity
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setAdapter(new PageAdapter(getSupportFragmentManager(), 3, HomeActivity.this));
+
+
 
         viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -496,8 +512,21 @@ public class HomeActivity extends AppCompatActivity
             }
         });
 
+
+
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);
+
+//        LayoutInflater inflater = LayoutInflater.from(this);
+//        View v=inflater.inflate(R.layout.nav_header_home,null);
+//        NavigationView nv=(NavigationView) findViewById(R.id.nav_view);
+//        TextView txtNavDisplayName=(TextView) findViewById(R.id.displayNameNavBar);
+//        try {
+//            txtNavDisplayName.setText("ehm");
+//        }catch (Exception e)
+//        {
+//            Toast.makeText(HomeActivity.this, e.printStackTrace();, Toast.LENGTH_LONG).show();
+//        }
     }
 
     @Override

@@ -10,9 +10,6 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
         android:paddingRight="10dp"
         android:paddingLeft="10dp"
         >
@@ -24,21 +21,20 @@
             android:layout_height="wrap_content"
             android:text="JChat"
             android:textSize="60dp"
-            android:id="@+id/textView"
-            android:layout_alignParentTop="true"
+            android:id="@+id/emailNavBar"
             android:textColor="#ffffff"
             android:typeface="serif"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_marginTop="30dp" />
+            android:layout_marginTop="0dp" />
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/textView"
+            android:layout_below="@+id/emailNavBar"
             android:id="@+id/linearLayout"
             android:layout_marginTop="5dp"
             android:weightSum="1">

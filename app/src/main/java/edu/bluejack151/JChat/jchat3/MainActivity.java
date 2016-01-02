@@ -129,6 +129,8 @@ public class MainActivity extends Activity {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
 
+//        Intent i = new Intent(getApplicationContext(), GambarDafuq.class);
+//                            startActivity(i);
         editor = getSharedPreferences(preferencesName, MODE_PRIVATE).edit();
         initComponent();
         userRef = new Firebase("https://jchatapps.firebaseio.com/user");

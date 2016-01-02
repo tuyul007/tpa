@@ -129,6 +129,8 @@ public class FragmentFriend  extends android.support.v4.app.Fragment{
         initFirebase();
         elv.setAdapter(adapter);
 
+
+
         fieldSearchFriend.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {

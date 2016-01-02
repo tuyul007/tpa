@@ -3,39 +3,42 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:alpha="0.8"
-    android:background="#000000"
+    android:background="#5f83f9"
+
     android:gravity="center_vertical"
     android:weightSum="1">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Loading"
-        android:textColor="#ffffff"
-        android:id="@+id/loadingHandler"
-        android:gravity="center"
-        android:visibility="invisible"
-        android:textSize="25dp" />
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Loading"
-        android:textColor="#ffffff"
-        android:id="@+id/loadText"
-        android:gravity="center"
-        android:visibility="visible"
-        android:textSize="25dp" />
+    <RelativeLayout
+        android:layout_width="250dp"
+        android:layout_height="200dp"
+        android:layout_weight="0.13"
+        android:background="@drawable/load_logo"
+        android:layout_marginBottom="50dp"
+        android:layout_gravity="center_horizontal">
 
-    <ProgressBar
-        android:layout_width="103dp"
-        android:layout_height="104dp"
-        android:id="@+id/loadingProgressBar"
-        android:layout_gravity="center_horizontal"
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Loading"
+            android:textColor="#ffffff"
+            android:id="@+id/loadingHandler"
+            android:gravity="center"
+            android:visibility="invisible"
+            android:textSize="25dp" />
 
-        android:max="100"
+        <ProgressBar
+            android:layout_width="103dp"
+            android:layout_height="104dp"
+            android:id="@+id/loadingProgressBar"
+            android:layout_gravity="center_horizontal"
 
-        android:indeterminate="true"
-        android:alpha="0.9" />
+            android:max="100"
+
+            android:indeterminate="true"
+            android:alpha="0.9"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true" />
+    </RelativeLayout>
+
 </LinearLayout>
