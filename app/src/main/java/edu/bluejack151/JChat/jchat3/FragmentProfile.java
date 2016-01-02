@@ -154,7 +154,7 @@ public class FragmentProfile extends android.support.v4.app.Fragment{
                     HomeActivity.userRef.child(HomeActivity.userSessionAccount.getUserId()).setValue(HomeActivity.userSessionAccount);
                     editableProfileContent.set(0, HomeActivity.userSessionAccount.getDisplayName());
 
-//                    HomeActivity.refresehNavigationDrawer();
+                    HomeActivity.refresehNavigationDrawer();
 
 
                     edP.notifyDataSetChanged();
@@ -192,7 +192,7 @@ public class FragmentProfile extends android.support.v4.app.Fragment{
                 HomeActivity.userRef.child(HomeActivity.userSessionAccount.getUserId()).setValue(HomeActivity.userSessionAccount);
                 editableProfileContent.set(1, HomeActivity.userSessionAccount.getGender());
                 edP.notifyDataSetChanged();
-//                HomeActivity.refresehNavigationDrawer();
+                HomeActivity.refresehNavigationDrawer();
                 dialogGenderChange.dismiss();
             }
         });
@@ -228,7 +228,7 @@ public class FragmentProfile extends android.support.v4.app.Fragment{
                     imageStore= Base64.encodeToString(byteArray, Base64.DEFAULT);
                     HomeActivity.userSessionAccount.setProfilePicture(imageStore);
                     HomeActivity.userRef.child(HomeActivity.userSessionAccount.getUserId()).setValue(HomeActivity.userSessionAccount);
-//                    HomeActivity.refresehNavigationDrawer();
+                    HomeActivity.refresehNavigationDrawer();
                     Toast.makeText(getActivity(), "Image Changed", Toast.LENGTH_SHORT).show();
 
                         imageView.setImageDrawable(roundImage);

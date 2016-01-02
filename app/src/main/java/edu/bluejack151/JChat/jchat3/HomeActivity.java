@@ -200,22 +200,26 @@ public class HomeActivity extends AppCompatActivity
                                                 final Chat c = chatSnapshot.getValue(Chat.class);
                                                 if (c.getTimeStamp() != 0) {
                                                     if (!c.getGroupId().equals("")) {
-                                                        if (chatList.get(c.getGroupId()) == null &&
-                                                                groupSnapshot.hasChild(c.getGroupId() + "_" + userSessionAccount.getUserId())) {
-                                                            chatList.put(c.getGroupId(), new ChatAdapterItem());
+                                                        if(groupSnapshot.hasChild(c.getGroupId() + "_" + userSessionAccount.getUserId())){
+                                                            if (chatList.get(c.getGroupId()) == null) {
+                                                                chatList.put(c.getGroupId(), new ChatAdapterItem());
+                                                                chatList.get(c.getGroupId()).setGroup(groupSnapshot.child(c.getGroupId() + "_" + userSessionAccount.getUserId()).getValue(GroupIdentity.class));
+                                                            }
                                                             chatList.get(c.getGroupId()).setLastChat(c);
-                                                            chatList.get(c.getGroupId()).setGroup(groupSnapshot.child(c.getGroupId() + "_" + userSessionAccount.getUserId()).getValue(GroupIdentity.class));
+                                                            int notif = 0;
                                                             if (notifSnapshot.getChildrenCount() != 0) {
                                                                 for (DataSnapshot ds : notifSnapshot.getChildren()) {
                                                                     GroupNotif gn = ds.getValue(GroupNotif.class);
-                                                                    if (gn.getGroupId().equals(chatList.get(c.getGroupId()).getGroup()) && gn.getUserId().equals(userSessionAccount.getUserId()))
-                                                                        chatList.get(c.getGroupId()).setNotifCount(chatList.get(c.getGroupId()).getNotifCount() + 1);
+                                                                    if (gn.getGroupId().equals(c.getGroupId()) && gn.getUserId().equals(userSessionAccount.getUserId()))
+                                                                        notif++;
                                                                 }
                                                             }
+                                                            chatList.get(c.getGroupId()).setNotifCount(notif);
                                                             FragmentChat.updateView();
-                                                        } else if (groupSnapshot.hasChild(c.getGroupId() + "_" + userSessionAccount.getUserId())) {
-                                                            chatList.get(c.getGroupId()).setLastChat(c);
-                                                            FragmentChat.updateView();
+                                                            if (!c.getFromId().equals(HomeActivity.userSessionAccount.getUserId()) && GroupChatActivity.set) {
+                                                                GroupChatActivity.listChat.setLastChat(c);
+                                                                GroupChatActivity.adapter.notifyDataSetChanged();
+                                                            }
                                                         }
                                                     } else {
                                                         if (c.getFromId().equals(userSessionAccount.getUserId())
@@ -379,9 +383,12 @@ public class HomeActivity extends AppCompatActivity
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 if (!updateGroup) return;
-                GroupIdentity g = null;
-                g = dataSnapshot.getValue(GroupIdentity.class);
-                if (g.getUserId().equals(HomeActivity.userSessionAccount.getUserId())) {
+                GroupIdentity g = dataSnapshot.getValue(GroupIdentity.class);
+                FriendListItem fl = new FriendListItem();
+                fl.setGroupIdentity(g);
+
+                if (g.getUserId().equals(HomeActivity.userSessionAccount.getUserId())
+                        && !HomeActivity.tempFriendList.get(FragmentFriend.GROUP).getFriendList().contains(fl)) {
                     HomeActivity.tempFriendList.get(FragmentFriend.GROUP).getFriendList().add(new FriendListItem());
                     HomeActivity.tempFriendList.get(FragmentFriend.GROUP).getFriendList().get(
                             HomeActivity.tempFriendList.get(FragmentFriend.GROUP).getFriendList().size() - 1
@@ -524,8 +531,8 @@ public class HomeActivity extends AppCompatActivity
     {
         View vHeader=navigationView.getHeaderView(0);
         TextView txtNavDisplayName=(TextView) vHeader.findViewById(R.id.displayNameNavBar);
-        TextView txtNavEmail=(TextView) vHeader.findViewById(R.id.emailNavBar);
-        ImageView imgProfNav=(ImageView) vHeader.findViewById(R.id.profImageSlide);
+        TextView txtNavEmail = (TextView) vHeader.findViewById(R.id.emailNavBar);
+        ImageView imgProfNav = (ImageView) vHeader.findViewById(R.id.profImageSlide);
         txtNavDisplayName.setText(userSessionAccount.getDisplayName());
         txtNavEmail.setText(userSessionAccount.getEmail());
 
