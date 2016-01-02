@@ -3,29 +3,94 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    >
+    android:weightSum="1">
 
-    <ImageView
-        android:id="@+id/myimg"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
-        android:scaleType="fitXY"
-        android:layout_gravity="center_horizontal"
-        android:background="@drawable/com_facebook_profile_picture_blank_square"
-        />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="273dp"
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Lorem Ipsum BLALALALALALLAAL"
-        android:layout_gravity="center_horizontal"
-        android:id="@+id/message" />
+        >
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Edit Profile"
-        android:id="@+id/button"
-        android:layout_gravity="center_horizontal" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:id="@+id/imageView2"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:background="#5f83f9"
+            android:alpha="0.7"
+            />
+
+        <ImageView
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:scaleType="centerCrop"
+            android:id="@+id/profileFragmentPicture"
+            android:src="@drawable/com_facebook_profile_picture_blank_portrait"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="17dp"
+            android:adjustViewBounds="true"
+            />
+
+        <TextView
+            android:gravity="center_horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Medium Text"
+            android:id="@+id/userIdProfileTxt"
+            android:textColor="#ffffff"
+            android:layout_below="@+id/btnProfileChangePic"
+            android:layout_marginTop="20dp"
+            android:layout_alignLeft="@+id/profileFragmentPicture"
+            android:layout_alignStart="@+id/profileFragmentPicture"
+            android:layout_alignRight="@+id/profileFragmentPicture"
+            android:layout_alignEnd="@+id/profileFragmentPicture" />
+
+        <TextView
+            android:gravity="center_horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Medium Text"
+            android:id="@+id/emailProfileTxt"
+            android:textColor="#ffffff"
+            android:layout_below="@+id/userIdProfileTxt"
+            android:layout_alignLeft="@+id/userIdProfileTxt"
+            android:layout_alignStart="@+id/userIdProfileTxt"
+            android:layout_alignRight="@+id/userIdProfileTxt"
+            android:layout_alignEnd="@+id/userIdProfileTxt" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:text="Change Picture"
+            android:id="@+id/btnProfileChangePic"
+            android:textColor="#ffffff"
+            android:background="@drawable/button_boarder_new"
+            android:layout_alignLeft="@+id/profileFragmentPicture"
+            android:layout_alignStart="@+id/profileFragmentPicture"
+            android:layout_alignRight="@+id/profileFragmentPicture"
+            android:layout_alignEnd="@+id/profileFragmentPicture"
+            android:layout_alignBottom="@+id/profileFragmentPicture"
+            />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ListView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/listEditableProfile"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true" />
+    </RelativeLayout>
 </LinearLayout>

@@ -10,14 +10,13 @@
     tools:context="edu.bluejack151.JChat.jchat3.GambarDafuq">
 
     <ImageView
-        android:layout_width="300dp"
-        android:layout_height="300dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:id="@+id/imgTesUpload"
 
         android:minWidth="300dp"
         android:minHeight="300dp"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
         android:src="@drawable/com_facebook_profile_picture_blank_portrait"
         />
 
