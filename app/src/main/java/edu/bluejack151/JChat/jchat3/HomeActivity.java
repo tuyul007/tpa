@@ -534,12 +534,9 @@ public class HomeActivity extends AppCompatActivity
                 userSessionAccount.getProfilePicture()
                 , Base64.DEFAULT);
         Bitmap bmp = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
-        Bitmap bmp4 = Bitmap.createScaledBitmap(bmp, 50, 50, false);
-
         Bitmap bmp3=Bitmap.createScaledBitmap(bmp2, 50, 50, false);
-
-
         if(bmp!=null) {
+            Bitmap bmp4 = Bitmap.createScaledBitmap(bmp, 50, 50, false);
             roundImage=new RoundImage(bmp4,50,50);
             imgProfNav.setImageDrawable(roundImage);
         }
