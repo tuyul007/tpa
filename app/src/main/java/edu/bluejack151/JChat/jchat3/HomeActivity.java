@@ -360,7 +360,7 @@ public class HomeActivity extends AppCompatActivity
                     updateGroup = updateUser = true;
                     setLayout();
                     ready = true;
-                    Toast.makeText(getApplicationContext(), "Welcome," + userSessionAccount.getDisplayName(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Welcome," + userSessionAccount .getDisplayName(), Toast.LENGTH_SHORT).show();
                 }
             }
         });

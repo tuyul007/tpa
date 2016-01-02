@@ -25,7 +25,8 @@
             android:text="John"
             android:textSize="22dp"
             android:textStyle="bold"
-            android:id="@+id/chatItemFromName" />
+            android:id="@+id/chatItemFromName"
+            android:paddingLeft="@dimen/abc_action_bar_content_inset_material" />
         <TextView
             android:layout_width="fill_parent"
             android:gravity="center_vertical|left"
@@ -33,7 +34,8 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="FAKKKKKKKK"
 
-            android:id="@+id/lastChatMsg" />
+            android:id="@+id/lastChatMsg"
+            android:paddingLeft="@dimen/abc_action_bar_content_inset_material" />
 
 
     </LinearLayout>
