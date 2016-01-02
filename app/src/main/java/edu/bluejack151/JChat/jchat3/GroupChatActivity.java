@@ -49,7 +49,7 @@ public class GroupChatActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_private_chat);
+        setContentView(R.layout.activity_group_chat);
         HomeActivity.chatRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
