@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Switch;
 import android.widget.Toast;
@@ -17,19 +18,33 @@ public class AccountSetting extends AppCompatActivity {
 
     Switch switchNotif;
     CheckBox publicUser;
+    Button clearChat;
+    Button viewHelp;
+    Boolean switchCheck;
+    Boolean publicCheck;
 
 
     void initComponent(){
         switchNotif = (Switch)findViewById(R.id.notifSwitchSetting);
         publicUser = (CheckBox)findViewById(R.id.publicSettingCbox);
+        clearChat = (Button)findViewById(R.id.clearChatHistoryButton);
+        viewHelp = (Button)findViewById(R.id.viewHelpButton);
 
-        if(HomeActivity.userSessionAccount.getNotification() == 1)switchNotif.setChecked(true);
-        if(HomeActivity.userSessionAccount.getIsPublic() == 1)publicUser.setChecked(true);
+        switchCheck = false;
+        publicCheck = false;
+
+        if(HomeActivity.userSessionAccount.getNotification() == 1){
+            switchNotif.setChecked(true);
+            switchCheck = true;
+        }
+        if(HomeActivity.userSessionAccount.getIsPublic() == 1){
+            publicUser.setChecked(true);
+            publicCheck =true;
+        }
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_account_setting);
         this.setTitle("Account Setting");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -38,11 +53,12 @@ public class AccountSetting extends AppCompatActivity {
         switchNotif.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                switchNotif.setChecked(!switchNotif.isChecked());
-                Toast.makeText(AccountSetting.this, switchNotif.isChecked()+"", Toast.LENGTH_SHORT).show();
-                if(switchNotif.isChecked()){
+                switchCheck = !switchCheck;
+
+                switchNotif.setChecked(switchCheck);
+                if (switchCheck) {
                     HomeActivity.userSessionAccount.setNotification(1);
-                }else{
+                } else {
                     HomeActivity.userSessionAccount.setNotification(0);
                 }
 
@@ -53,14 +69,30 @@ public class AccountSetting extends AppCompatActivity {
         publicUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                publicUser.setChecked(!publicUser.isChecked());
-                Toast.makeText(AccountSetting.this, publicUser.isChecked()+"", Toast.LENGTH_SHORT).show();
-                if(publicUser.isChecked()){
+                publicCheck = !publicCheck;
+
+                publicUser.setChecked(publicCheck);
+
+                if(publicCheck){
                     HomeActivity.userSessionAccount.setIsPublic(1);
                 }else{
                     HomeActivity.userSessionAccount.setIsPublic(0);
                 }
                 HomeActivity.userRef.child(HomeActivity.userSessionAccount.getUserId()).setValue(HomeActivity.userSessionAccount);
+            }
+        });
+
+        clearChat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(AccountSetting.this, "This feature is not avalaible now", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        viewHelp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(AccountSetting.this, "This feature is not avalaible now", Toast.LENGTH_SHORT).show();
             }
         });
 
