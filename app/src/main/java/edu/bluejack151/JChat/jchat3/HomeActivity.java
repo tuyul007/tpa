@@ -47,7 +47,8 @@ import org.w3c.dom.Text;
 import edu.bluejack151.JChat.jchat3.AdapterHelper.ChatAdapterItem;
 import edu.bluejack151.JChat.jchat3.AdapterHelper.ChatListItem;
 import edu.bluejack151.JChat.jchat3.AdapterHelper.FriendListItem;
-import edu.bluejack151.JChat.jchat3.AdapterHelper.GroupNotif;
+import edu.bluejack151.JChat.jchat3.Helper.GroupNotif;
+import edu.bluejack151.JChat.jchat3.AdapterHelper.PageAdapter;
 import edu.bluejack151.JChat.jchat3.AdapterHelper.ParentFriendListItem;
 import edu.bluejack151.JChat.jchat3.Helper.Chat;
 import edu.bluejack151.JChat.jchat3.Helper.Friend;
@@ -377,17 +378,17 @@ public class HomeActivity extends AppCompatActivity
         groupRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                if(!updateGroup)return;
+                if (!updateGroup) return;
                 GroupIdentity g = null;
                 g = dataSnapshot.getValue(GroupIdentity.class);
                 if (g.getUserId().equals(HomeActivity.userSessionAccount.getUserId())) {
-                        HomeActivity.tempFriendList.get(FragmentFriend.GROUP).getFriendList().add(new FriendListItem());
-                        HomeActivity.tempFriendList.get(FragmentFriend.GROUP).getFriendList().get(
-                                HomeActivity.tempFriendList.get(FragmentFriend.GROUP).getFriendList().size() - 1
-                        ).setGroupIdentity(g);
+                    HomeActivity.tempFriendList.get(FragmentFriend.GROUP).getFriendList().add(new FriendListItem());
+                    HomeActivity.tempFriendList.get(FragmentFriend.GROUP).getFriendList().get(
+                            HomeActivity.tempFriendList.get(FragmentFriend.GROUP).getFriendList().size() - 1
+                    ).setGroupIdentity(g);
 
-                        FragmentFriend.adapter.setFriendAndGroupList(tempFriendList);
-                        FragmentFriend.adapter.notifyDataSetChanged();
+                    FragmentFriend.adapter.setFriendAndGroupList(tempFriendList);
+                    FragmentFriend.adapter.notifyDataSetChanged();
                 }
             }
 
@@ -438,7 +439,7 @@ public class HomeActivity extends AppCompatActivity
     }
 
     static Toolbar toolbar;
-    RoundImage roundImage;
+   static RoundImage roundImage;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         shrd = getSharedPreferences(MainActivity.preferencesName, Context.MODE_PRIVATE);
@@ -457,7 +458,7 @@ public class HomeActivity extends AppCompatActivity
 
 
     }
-
+    static NavigationView navigationView;
     void setLayout() {
         setContentView(R.layout.activity_home);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -470,7 +471,7 @@ public class HomeActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
@@ -512,23 +513,42 @@ public class HomeActivity extends AppCompatActivity
             }
         });
 
-
-
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);
+         bmp2 = BitmapFactory.decodeResource(getResources(), R.drawable.com_facebook_profile_picture_blank_portrait);
+        refresehNavigationDrawer();
 
-//        LayoutInflater inflater = LayoutInflater.from(this);
-//        View v=inflater.inflate(R.layout.nav_header_home,null);
-//        NavigationView nv=(NavigationView) findViewById(R.id.nav_view);
-//        TextView txtNavDisplayName=(TextView) findViewById(R.id.displayNameNavBar);
-//        try {
-//            txtNavDisplayName.setText("ehm");
-//        }catch (Exception e)
-//        {
-//            Toast.makeText(HomeActivity.this, e.printStackTrace();, Toast.LENGTH_LONG).show();
-//        }
     }
+    static Bitmap bmp2;
+    public  static void refresehNavigationDrawer()
+    {
+        View vHeader=navigationView.getHeaderView(0);
+        TextView txtNavDisplayName=(TextView) vHeader.findViewById(R.id.displayNameNavBar);
+        TextView txtNavEmail=(TextView) vHeader.findViewById(R.id.emailNavBar);
+        ImageView imgProfNav=(ImageView) vHeader.findViewById(R.id.profImageSlide);
+        txtNavDisplayName.setText(userSessionAccount.getDisplayName());
+        txtNavEmail.setText(userSessionAccount.getEmail());
 
+
+        byte[] imageAsBytes = Base64.decode(
+                userSessionAccount.getProfilePicture()
+                , Base64.DEFAULT);
+        Bitmap bmp = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
+        Bitmap bmp4 = Bitmap.createScaledBitmap(bmp, 50, 50, false);
+
+        Bitmap bmp3=Bitmap.createScaledBitmap(bmp2, 50, 50, false);
+
+
+        if(bmp!=null) {
+            roundImage=new RoundImage(bmp4,50,50);
+            imgProfNav.setImageDrawable(roundImage);
+        }
+        else
+        {
+            roundImage=new RoundImage(bmp3,50,50);
+            imgProfNav.setImageDrawable(roundImage);
+        }
+    }
     @Override
     public void onBackPressed() {
         if (!ready) {
