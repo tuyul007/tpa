@@ -189,7 +189,7 @@ public class FragmentFriend  extends android.support.v4.app.Fragment{
                     if (popUpMenu1.getText().equals("Accept")) {
                         fl.getGroupIdentity().setAccept(1);
                         groupRef.child(fl.getGroupIdentity().getGroupId() + "_" +
-                                fl.getGroupIdentity().getUserId()).setValue(fl.getGroupIdentity());
+                                fl.getGroupIdentity().getUserId()).child("Accept").setValue(fl.getGroupIdentity().getAccept());
 
                         HomeActivity.userSessionAccount.setTotalGroup((HomeActivity.userSessionAccount.getTotalGroup() + 1));
                         userRef.child(HomeActivity.userSessionAccount.getUserId()).setValue(HomeActivity.userSessionAccount);

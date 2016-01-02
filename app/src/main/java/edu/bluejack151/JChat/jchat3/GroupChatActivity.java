@@ -81,7 +81,7 @@ public class GroupChatActivity extends AppCompatActivity {
                                         Chat c = ds.getValue(Chat.class);
                                         if (!c.getMessage().equals(""))
                                             if(c.getGroupId().equals(listChat.getGroup().getGroupId())){
-                                                HomeActivity.groupNotifRef.child(c.getTimeStamp()+"").removeValue();
+                                                HomeActivity.groupNotifRef.child(c.getTimeStamp()+"_"+HomeActivity.userSessionAccount.getUserId()).removeValue();
                                                 listChat.setLastChat(c);
                                             }
                                     }
@@ -108,8 +108,8 @@ public class GroupChatActivity extends AppCompatActivity {
                                                         UserAccount user = data.getValue();
                                                         if(!user.getUserId().equals(HomeActivity.userSessionAccount.getUserId()))
                                                         if (!dataSnapshot.hasChild("IN_" + listChat.getGroup().getGroupId() + "_" + user.getUserId())) {
-                                                            HomeActivity.groupNotifRef.child(c.getTimeStamp()+"").setValue(
-                                                                    new GroupNotif(listChat.getGroup().getGroupId(),user.getUserId())
+                                                            HomeActivity.groupNotifRef.child(c.getTimeStamp()+"_"+user.getUserId()).setValue(
+                                                                    new GroupNotif(listChat.getGroup().getGroupId(), user.getUserId())
                                                             );
                                                         }
                                                     }
