@@ -84,8 +84,8 @@ public class FragmentProfile extends android.support.v4.app.Fragment{
         TextView txtUserId=(TextView) view.findViewById(R.id.userIdProfileTxt);
         TextView txtProfileEmail=(TextView) view.findViewById(R.id.emailProfileTxt);
 
-        txtUserId.setText(HomeActivity.userSessionAccount.getUserId());
-        txtProfileEmail.setText(HomeActivity.userSessionAccount.getEmail());
+        txtUserId.setText("User ID: "+HomeActivity.userSessionAccount.getUserId());
+        txtProfileEmail.setText("Email: "+HomeActivity.userSessionAccount.getEmail());
         btnChangePictureProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
