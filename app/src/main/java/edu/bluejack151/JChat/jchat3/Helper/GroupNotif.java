@@ -1,4 +1,4 @@
-package edu.bluejack151.JChat.jchat3.AdapterHelper;
+package edu.bluejack151.JChat.jchat3.Helper;
 
 /**
  * Created by ASUS on 27/12/2015.
@@ -6,7 +6,13 @@ package edu.bluejack151.JChat.jchat3.AdapterHelper;
 public class GroupNotif {
     private String groupId;
     private String userId;
-    private int groupStatus;
+
+    public GroupNotif(){}
+
+    public GroupNotif(String groupId, String userId) {
+        this.groupId = groupId;
+        this.userId = userId;
+    }
 
     public String getGroupId() {
         return groupId;
@@ -22,13 +28,5 @@ public class GroupNotif {
 
     public void setUserId(String userId) {
         this.userId = userId;
-    }
-
-    public int getGroupStatus() {
-        return groupStatus;
-    }
-
-    public void setGroupStatus(int groupStatus) {
-        this.groupStatus = groupStatus;
     }
 }

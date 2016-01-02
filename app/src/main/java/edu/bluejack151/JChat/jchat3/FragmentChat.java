@@ -15,6 +15,8 @@ import com.shiperus.ark.jchat3.R;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 
 import edu.bluejack151.JChat.jchat3.AdapterHelper.ChatAdapterItem;
@@ -44,11 +46,31 @@ public class FragmentChat extends android.support.v4.app.Fragment {
         lv.setAdapter(adapter);
 
     }
+
+    static List<Map.Entry<String,ChatAdapterItem>> entriesSortedByValues(Map<String,ChatAdapterItem> map) {
+
+        List<Map.Entry<String,ChatAdapterItem>> sortedEntries = new ArrayList<Map.Entry<String,ChatAdapterItem>>(map.entrySet());
+
+        Collections.sort(sortedEntries,
+                new Comparator<Map.Entry<String,ChatAdapterItem>>() {
+                    @Override
+                    public int compare(Map.Entry<String,ChatAdapterItem> e1, Map.Entry<String,ChatAdapterItem> e2) {
+                        int compare =
+                                (e1.getValue().getLastChat().getTimeStamp()<e2.getValue().getLastChat().getTimeStamp())?1:-1;
+                        return compare;
+                    }
+                }
+        );
+
+        return sortedEntries;
+    }
     public static void updateView(){
         if(listChatView!=null) {
             listChatView.clear();
-            for (Map.Entry<String, ChatAdapterItem> data : HomeActivity.chatList.entrySet()) {
-                System.out.println(data.getKey());
+
+            List<Map.Entry<String,ChatAdapterItem>> sortedEntries = entriesSortedByValues(HomeActivity.chatList);
+
+            for (Map.Entry<String, ChatAdapterItem> data : sortedEntries) {
                 listChatView.add(data.getValue());
             }
             if(adapter!=null){

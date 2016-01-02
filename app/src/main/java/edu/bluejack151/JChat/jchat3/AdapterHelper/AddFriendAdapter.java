@@ -62,7 +62,6 @@ public class AddFriendAdapter  extends ArrayAdapter{
 
         if(!getData(position).getProfilePicture().equals("")){
             byte[] imageAsBytes = Base64.decode(getData(position).getProfilePicture(), Base64.DEFAULT);
-            //Toast.makeText(AddFriendAdapter.this, getData(position).getProfilePicture(), Toast.LENGTH_SHORT).show();
             Bitmap bitmap = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
             profileSearch.setImageBitmap(bitmap);
         }

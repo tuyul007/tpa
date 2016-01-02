@@ -45,9 +45,6 @@ public class PrivateChatActivity extends AppCompatActivity {
         HomeActivity.chatRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
-                    HomeActivity.friendRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot friendSnapshot) {
                             initComponent();
                             setTitle(listChat.getUser().getDisplayName());
                             listChat.setListChat(new ArrayList<Chat>());
@@ -56,7 +53,6 @@ public class PrivateChatActivity extends AppCompatActivity {
                                             , listChat.getUser().getUserId()
                                             , "", 0, "", 0));
                             if(HomeActivity.chatList.get(listChat.getUser().getUserId())!=null) {
-                                if(friendSnapshot.hasChild(HomeActivity.userSessionAccount.getUserId()+"_"+listChat.getUser().getUserId()));
                                 HomeActivity.chatList.get(listChat.getUser().getUserId()).setNotifCount(0);
                                 FragmentChat.updateView();
                                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
@@ -107,13 +103,6 @@ public class PrivateChatActivity extends AppCompatActivity {
                                     }
                                 }
                             });
-                        }
-
-                        @Override
-                        public void onCancelled(FirebaseError firebaseError) {
-
-                        }
-                    });
                 }
 
                 @Override

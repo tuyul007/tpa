@@ -1,4 +1,4 @@
-package edu.bluejack151.JChat.jchat3;
+package edu.bluejack151.JChat.jchat3.AdapterHelper;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.v4.app.Fragment;
@@ -11,6 +11,10 @@ import android.text.style.ImageSpan;
 import android.support.v7.widget.Toolbar;
 
 import com.shiperus.ark.jchat3.R;
+
+import edu.bluejack151.JChat.jchat3.FragmentChat;
+import edu.bluejack151.JChat.jchat3.FragmentFriend;
+import edu.bluejack151.JChat.jchat3.FragmentProfile;
 
 
 /**

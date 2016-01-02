@@ -70,8 +70,7 @@ public class ChatListAdapter extends ArrayAdapter{
     }
 
     @Override
-    public View getView(final int position,View view,ViewGroup parent) {
-        LayoutInflater inflater=context.getLayoutInflater();
+    public View getView(int position,View view,ViewGroup parent) {
         if(view == null)view = LayoutInflater.from(getContext()).inflate(R.layout.list_chat, null);
 
         TextView txtFromName = (TextView) view.findViewById(R.id.chatItemFromName);
@@ -82,14 +81,15 @@ public class ChatListAdapter extends ArrayAdapter{
         if(chatIdentiyList.get(position).getGroup() == null){
             //private chat
             txtFromName.setText(getUserAccount(position).getDisplayName());
-            if(!getProfilePicture(position).equals("")){
+
+            if(getProfilePicture(position).length()>0){
                 byte[] imageAsBytes = Base64.decode(getProfilePicture(position), Base64.DEFAULT);
-                Bitmap bmp= BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
+                Bitmap bmp = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
                 profileChat.setImageBitmap(bmp);
             }
         }else{
             //groupchat
-            txtFromName.setText(getGroupIdentity(position).getGroupName());
+            txtFromName.setText("[GROUP] "+getGroupIdentity(position).getGroupName());
 
         }
         txtChatMsg.setText(getMessage(position));

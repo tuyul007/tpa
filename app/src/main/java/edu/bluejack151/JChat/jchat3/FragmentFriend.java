@@ -32,6 +32,7 @@ import java.util.ArrayList;
 
 import edu.bluejack151.JChat.jchat3.AdapterHelper.ChatListItem;
 import edu.bluejack151.JChat.jchat3.AdapterHelper.FriendListItem;
+import edu.bluejack151.JChat.jchat3.AdapterHelper.GroupChatViewAdapter;
 import edu.bluejack151.JChat.jchat3.AdapterHelper.ParentFriendListItem;
 import edu.bluejack151.JChat.jchat3.Helper.Friend;
 import edu.bluejack151.JChat.jchat3.Helper.GroupIdentity;
@@ -194,8 +195,14 @@ public class FragmentFriend  extends android.support.v4.app.Fragment{
                         adapter.notifyDataSetChanged();
                         dialog.dismiss();
                     } else {
-                        //chat
-                        toastMsg("group chat");
+                        //group chat
+                        GroupChatActivity.listChat = new ChatListItem();
+                        GroupChatActivity.listChat.setGroup(fl.getGroupIdentity());
+
+                        Intent i = new Intent(getActivity(),GroupChatActivity.class);
+                        startActivity(i);
+
+                        dialog.dismiss();
                     }
                 }
             });
@@ -209,6 +216,8 @@ public class FragmentFriend  extends android.support.v4.app.Fragment{
                     if(popUpMenu2.getText().equals("Leave Group")){
                         HomeActivity.userSessionAccount.setTotalGroup((HomeActivity.userSessionAccount.getTotalGroup() - 1));
                         userRef.child(HomeActivity.userSessionAccount.getUserId()).setValue(HomeActivity.userSessionAccount);
+                        HomeActivity.chatList.remove(fl.getGroupIdentity().getGroupId());
+                        FragmentChat.updateView();
                     }
                     HomeActivity.totalGroup--;
                     adapter.notifyDataSetChanged();

@@ -3,176 +3,167 @@ package edu.bluejack151.JChat.jchat3;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.CheckedTextView;
-import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import com.shiperus.ark.jchat3.R;
 
 import java.util.ArrayList;
-import java.util.List;
+
+import edu.bluejack151.JChat.jchat3.AdapterHelper.DialogGroupInviteAdapter;
+import edu.bluejack151.JChat.jchat3.AdapterHelper.InvitedFriendPageAdapter;
+import edu.bluejack151.JChat.jchat3.Helper.GroupIdentity;
+import edu.bluejack151.JChat.jchat3.Helper.UserAccount;
 
 public class CreateGroup extends AppCompatActivity {
 
     Dialog dialog;
-    ArrayAdapter<String> adapter;
-    ListView listView2;
+    ArrayList<UserAccount> friendList;
+    ArrayList<Boolean> checked;
+    DialogGroupInviteAdapter dialogInviteAdapter;
+    InvitedFriendPageAdapter invitedAdapter;
+    ListView lv;
+    ListView listInvitedFriendS;
+    ArrayList<UserAccount> listInvitedFriend;
+
+
+    EditText fieldGroupName;
+    Button createGroup;
+    Button cancel;
+
+    void initComponent(){
+        fieldGroupName = (EditText)findViewById(R.id.inputGroupName);
+        createGroup = (Button)findViewById(R.id.buttonCreateGroup);
+        cancel = (Button)findViewById(R.id.buttonCancelGroup);
+
+        friendList = new ArrayList<>();
+        checked = new ArrayList<>();
+        initFriendList();
+
+        listInvitedFriend=new ArrayList<>();
+        listInvitedFriendS=(ListView) findViewById(R.id.listInvitedFriend);
+        invitedAdapter = new InvitedFriendPageAdapter(this,listInvitedFriend);
+        listInvitedFriendS.setAdapter(invitedAdapter);
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        createGroup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (fieldGroupName.getText().toString() != null && fieldGroupName.getText().toString().length() < 3) {
+                    Toast.makeText(CreateGroup.this, "Group's name length min 3 character", Toast.LENGTH_SHORT).show();
+                } else {
+                    String groupId = "G" + HomeActivity.userSessionAccount.getTotalGroup() + "_" + HomeActivity.userSessionAccount.getUserId();
+                    String groupName = fieldGroupName.getText().toString();
+                    String userId = HomeActivity.userSessionAccount.getUserId();
+
+                    HomeActivity.groupRef.child(groupId+"_"+userId).setValue(new GroupIdentity(groupId, groupName, userId, 1));
+                    HomeActivity.userSessionAccount.setTotalGroup((HomeActivity.userSessionAccount.getTotalGroup() + 1));
+                    HomeActivity.userRef.child(HomeActivity.userSessionAccount.getUserId()).setValue(HomeActivity.userSessionAccount);
+
+                    for (int i = 0; i < listInvitedFriend.size(); i++) {
+                        userId = listInvitedFriend.get(i).getUserId();
+                        HomeActivity.groupRef.child(groupId+"_"+userId).setValue(new GroupIdentity(groupId, groupName, userId, 0));
+                    }
+                    finish();
+                }
+            }
+        });
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        listSearchName.add("wewew1");
-        listSearchName.add("wewew2");
-        listSearchName.add("wewew3");
-        listSearchName.add("wewew4");
-        listSearchName.add("wewew5");
-        listSearchName.add("wewew6");
-
-        listSearchImageProfile.add(R.drawable.com_facebook_profile_picture_blank_portrait);
-        listSearchImageProfile.add(R.drawable.com_facebook_profile_picture_blank_portrait);
-        listSearchImageProfile.add(R.drawable.com_facebook_button_like_icon_selected);
-        listSearchImageProfile.add(R.drawable.com_facebook_profile_picture_blank_portrait);
-        listSearchImageProfile.add(R.drawable.com_facebook_profile_picture_blank_portrait);
-        listSearchImageProfile.add(R.drawable.com_facebook_profile_picture_blank_portrait);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_group);
         setTitle("Create Group");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         initModalDialog();
-
-//        String[] sports = {"asu","asu2","asu3","benTAI","RickyTai"};
-//        listView2=(ListView)
-//        adapter = new ArrayAdapter<String>(this,
-//                android.R.layout.simple_list_item_multiple_choice, sports);
-//        listView2.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-//        listView2.setAdapter(adapter);
-
+        initComponent();
 
     }
-    ArrayList<String> listSearchName=new ArrayList<String>();
-    ArrayList<Integer> listSearchImageProfile=new ArrayList<>();
     public void initModalDialog()
     {
         dialog = new Dialog(CreateGroup.this);
 
         dialog.setTitle("Select Your Friend");
-//        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.group_invite_modal);
-
-        dialog.setOnDismissListener(new OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-//                Toast.makeText(getApplicationContext(),String.valueOf(lv.getCount()),Toast.LENGTH_SHORT).show();
-            }
-        });
-
-
-//        popUpMenu1 = (Button)dialog.findViewById(R.id.popup_1);
-//        popUpMenu2 =  (Button)dialog.findViewById(R.id.popup_2);
+        dialog.setCanceledOnTouchOutside(true);
     }
 
-     ListView lv;
-    ArrayList<String> listInvitedFriend=new ArrayList<String>();
 
-
+    void setListInvited(){
+        listInvitedFriend.clear();
+        for(int i=0; i<friendList.size(); i++){
+            if(checked.get(i)){
+                listInvitedFriend.add(friendList.get(i));
+            }
+        }
+    }
     public void confirmInvitation(View v)
     {
-//        for(int i=0;i<listInvitedFriend.size();i++)
-//        {
-//            int indx=Integer.valueOf(listInvitedFriend.get(i));
-//            Toast.makeText(CreateGroup.this, indx+"", Toast.LENGTH_SHORT).show();
-//
-//            listSearchName.remove(indx);
-//            listSearchImageProfile.remove(indx);
-//        }
-//        Toast.makeText(CreateGroup.this, ""+listSearchImageProfile.size(), Toast.LENGTH_SHORT).show();
-
-        ListView listInvitedFriendS=(ListView) findViewById(R.id.listInvitedFriend);
-        listInvitedFriendS.setAdapter(new InvitedFriendPageAdapter(this,listInvitedFriend,listSearchImageProfile));
+        setListInvited();
+        invitedAdapter.notifyDataSetChanged();
         dialog.dismiss();
-
-
-
     }
+    void refreshCheckedStats(){
+        if(listInvitedFriend.size()==0){
 
+        }else{
+            for(int i=0; i<friendList.size(); i++){
+                checked.set(i,false);
+            }
+            for(int i=0; i<listInvitedFriend.size(); i++){
+                if(friendList.contains(listInvitedFriend.get(i))){
+                    checked.set(friendList.indexOf(listInvitedFriend.get(i)),true);
+                }
+            }
+        }
+    }
+    void initFriendList(){
+        for(int i=0; i< HomeActivity.tempFriendList.get(1).getFriendList().size(); i++){
+            UserAccount user = HomeActivity.tempFriendList.get(1).getFriendList().get(i).getFriendDetail();
+            friendList.add(user);
+            checked.add(false);
+        }
+    }
     public void inviteDialog(View v)
     {
-
-        View view = getLayoutInflater().inflate(R.layout.group_invite_modal, null);
-        dialog.setContentView(view);
-
-
-        DialogGroupInviteAdapter dialogInviteAdapter=new DialogGroupInviteAdapter(this,listSearchName,listSearchImageProfile);
-
-//        for()
-//        {
-//            for()
-//            {
-//
-//            }
-//
-//        }
-
-
-         lv= (ListView)dialog.findViewById(R.id.listDialogInviteFriend);
+        refreshCheckedStats();
+        dialogInviteAdapter=new DialogGroupInviteAdapter(this,friendList,checked);
+        lv= (ListView)dialog.findViewById(R.id.listDialogInviteFriend);
         lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         lv.setAdapter(dialogInviteAdapter);
-//        String[] sports = {"asu","asu2","asu3","benTAI","RickyTai"};
-//        listView2=(ListView) findViewById(R.id.listDialogInviteFriend);
-//        adapter = new ArrayAdapter<String>(this,
-//                android.R.layout.simple_list_item_multiple_choice, sports);
-//        listView2.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-//        listView2.setAdapter(adapter);
 
-
-
-
-        AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> arg0, View arg1, int position, long id) {
-                // AdapterView is the parent class of ListView
-                ListView lv1 = (ListView) arg0;
-                CheckedTextView chkTxtView=(CheckedTextView)lv1.getChildAt(position).findViewById(R.id.chkInviteFriend);
-                chkTxtView.setChecked(!chkTxtView.isChecked());
-
-                if(chkTxtView.isChecked()==true)
-                {
-                    listInvitedFriend.add(listSearchName.get(position));
-                }
-                else if(chkTxtView.isChecked()==false)
-                {
-                    listInvitedFriend.remove(listInvitedFriend.indexOf(position+""));
-
-
-                }
-//                Toast.makeText(getBaseContext(), listInvitedFriend.size()+"", Toast.LENGTH_SHORT).show();
-//                chk.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        Toast.makeText(getBaseContext(), "Click Ehhh", Toast.LENGTH_SHORT).show();
-//                    }
-//                });
-//                if(lv1.isItemChecked(position)){
-//                    Toast.makeText(getBaseContext(), "You checked " + position, Toast.LENGTH_SHORT).show();
-//                }else{
-//                    lv1.setItemChecked(position,true);
-//                    Toast.makeText(getBaseContext(), "You unchecked " + position, Toast.LENGTH_SHORT).show();
+//        AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> arg0, View arg1, int position, long id) {
+//                // AdapterView is the parent class of ListView
+//                CheckedTextView chkTxtView=(CheckedTextView)lv.getTag(position);
+//                chkTxtView.setChecked(!chkTxtView.isChecked());
+//
+//                if(chkTxtView.isChecked()==true) {
+//                    checked.set(position,true);
+//                } else if(chkTxtView.isChecked()==false) {
+//                    checked.set(position,false);
 //                }
-            }
-        };
-
-        // Setting the ItemClickEvent listener for the listview
-        lv.setOnItemClickListener(itemClickListener);
+//            }
+//        };
+//
+//        // Setting the ItemClickEvent listener for the listview
+//        lv.setOnItemClickListener(itemClickListener);
 
 
         dialog.show();
