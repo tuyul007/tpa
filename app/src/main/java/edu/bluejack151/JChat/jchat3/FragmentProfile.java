@@ -153,6 +153,11 @@ public class FragmentProfile extends android.support.v4.app.Fragment{
                     HomeActivity.userSessionAccount.setDisplayName(editTextDisplayName.getText().toString());
                     HomeActivity.userRef.child(HomeActivity.userSessionAccount.getUserId()).setValue(HomeActivity.userSessionAccount);
                     editableProfileContent.set(0, HomeActivity.userSessionAccount.getDisplayName());
+
+                    HomeActivity.refresehNavigationDrawer();
+
+
+                    edP.notifyDataSetChanged();
                     dialogDisplayNameChange.dismiss();
                 }
                 else
@@ -187,7 +192,7 @@ public class FragmentProfile extends android.support.v4.app.Fragment{
                 HomeActivity.userRef.child(HomeActivity.userSessionAccount.getUserId()).setValue(HomeActivity.userSessionAccount);
                 editableProfileContent.set(1, HomeActivity.userSessionAccount.getGender());
                 edP.notifyDataSetChanged();
-
+                HomeActivity.refresehNavigationDrawer();
                 dialogGenderChange.dismiss();
             }
         });
@@ -208,29 +213,12 @@ public class FragmentProfile extends android.support.v4.app.Fragment{
                     int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
                     String picturePath = cursor.getString(columnIndex);
                     ImageView imageView = (ImageView) view.findViewById(R.id.profileFragmentPicture);
-                    Bitmap bmpChoosenImg= Bitmap.createScaledBitmap(BitmapFactory.decodeFile(picturePath), 150, 150, false);
-                    Bitmap bmpForUpload= Bitmap.createScaledBitmap(BitmapFactory.decodeFile(picturePath), 150, 150, false);
+                    Bitmap bmpChoosenImg = Bitmap.createScaledBitmap(BitmapFactory.decodeFile(picturePath), 150, 150, false);
+                    Bitmap bmpForUpload = Bitmap.createScaledBitmap(BitmapFactory.decodeFile(picturePath), 150, 150, false);
                     roundImage=new RoundImage(bmpChoosenImg,150,150);
 
                     ImageView imgNav=(ImageView) getActivity().findViewById(R.id.profImageSlide);
-                    byte[] imageAsBytes = Base64.decode(
-                            HomeActivity.userSessionAccount.getProfilePicture()
-                            , Base64.DEFAULT);
-                    Bitmap bmp = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
 
-                    Bitmap bmp2 = BitmapFactory.decodeResource(getResources(), R.drawable.com_facebook_profile_picture_blank_portrait);
-                    Bitmap bmp3=Bitmap.createScaledBitmap(bmp2, 150, 150, false);
-
-
-                    if(bmp!=null) {
-                        roundImage=new RoundImage(bmp,50,50);
-                        imgNav.setImageDrawable(roundImage);
-                    }
-                    else
-                    {
-                        roundImage=new RoundImage(bmp3,50,50);
-                        imgNav.setImageDrawable(roundImage);
-                    }
 
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
                     bmpForUpload.compress(Bitmap.CompressFormat.PNG, 100, stream);
@@ -240,7 +228,8 @@ public class FragmentProfile extends android.support.v4.app.Fragment{
                     imageStore= Base64.encodeToString(byteArray, Base64.DEFAULT);
                     HomeActivity.userSessionAccount.setProfilePicture(imageStore);
                     HomeActivity.userRef.child(HomeActivity.userSessionAccount.getUserId()).setValue(HomeActivity.userSessionAccount);
-                    Toast.makeText(getActivity(), imageStore, Toast.LENGTH_SHORT).show();
+                    HomeActivity.refresehNavigationDrawer();
+                    Toast.makeText(getActivity(), "Image Changed", Toast.LENGTH_SHORT).show();
 
                         imageView.setImageDrawable(roundImage);
                 }

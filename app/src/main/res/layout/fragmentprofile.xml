@@ -71,12 +71,11 @@
             android:id="@+id/btnProfileChangePic"
             android:textColor="#ffffff"
             android:background="@drawable/button_boarder_new"
+            android:layout_alignBottom="@+id/profileFragmentPicture"
             android:layout_alignLeft="@+id/profileFragmentPicture"
             android:layout_alignStart="@+id/profileFragmentPicture"
             android:layout_alignRight="@+id/profileFragmentPicture"
-            android:layout_alignEnd="@+id/profileFragmentPicture"
-            android:layout_alignBottom="@+id/profileFragmentPicture"
-            />
+            android:layout_alignEnd="@+id/profileFragmentPicture" />
 
     </RelativeLayout>
 
