@@ -1,8 +1,10 @@
 package edu.bluejack151.JChat.jchat3;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -36,6 +38,7 @@ public class GroupChatActivity extends AppCompatActivity {
     public static HashMap<String,UserAccount> groupMember;
     public static GroupChatViewAdapter adapter;
     Button btnSend ;
+    Button viewGroup;
     ListView listView;
     EditText fieldMsg ;
     public static Boolean set = false;
@@ -44,6 +47,7 @@ public class GroupChatActivity extends AppCompatActivity {
         btnSend = (Button)findViewById(R.id.button);
         listView = (ListView)findViewById(R.id.listView);
         fieldMsg = (EditText)findViewById(R.id.editText);
+        viewGroup = (Button)findViewById(R.id.viewGroupButton);
     }
 
     @Override
@@ -90,6 +94,14 @@ public class GroupChatActivity extends AppCompatActivity {
                                 listView.setAdapter(adapter);
                                 set = true;
 
+                                viewGroup.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Intent i = new Intent(getApplicationContext(), ViewGroupChat.class);
+                                        startActivity(i);
+                                    }
+                                });
+
                                 btnSend.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
@@ -107,11 +119,11 @@ public class GroupChatActivity extends AppCompatActivity {
                                                     for(Map.Entry<String,UserAccount> data : groupMember.entrySet()){
                                                         UserAccount user = data.getValue();
                                                         if(!user.getUserId().equals(HomeActivity.userSessionAccount.getUserId()))
-                                                        if (!dataSnapshot.hasChild("IN_" + listChat.getGroup().getGroupId() + "_" + user.getUserId())) {
-                                                            HomeActivity.groupNotifRef.child(c.getTimeStamp()+"_"+user.getUserId()).setValue(
-                                                                    new GroupNotif(listChat.getGroup().getGroupId(), user.getUserId())
-                                                            );
-                                                        }
+                                                            if (!dataSnapshot.hasChild("IN_" + listChat.getGroup().getGroupId() + "_" + user.getUserId())) {
+                                                                HomeActivity.groupNotifRef.child(c.getTimeStamp()+"_"+user.getUserId()).setValue(
+                                                                        new GroupNotif(listChat.getGroup().getGroupId(), user.getUserId())
+                                                                );
+                                                            }
                                                     }
 
                                                     listChat.setLastChat(c);

@@ -38,7 +38,8 @@
         <activity android:name="edu.bluejack151.JChat.jchat3.CreateGroup" />
         <activity android:name="edu.bluejack151.JChat.jchat3.GambarDafuq" />
         <activity android:name="edu.bluejack151.JChat.jchat3.PrivateChatActivity" />
-        <activity android:name="edu.bluejack151.JChat.jchat3.GroupChatActivity"></activity>
+        <activity android:name="edu.bluejack151.JChat.jchat3.GroupChatActivity" />
+        <activity android:name="edu.bluejack151.JChat.jchat3.ViewGroupChat"></activity>
     </application>
 
 </manifest>
