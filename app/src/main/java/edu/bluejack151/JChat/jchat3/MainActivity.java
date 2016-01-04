@@ -138,7 +138,7 @@ public class MainActivity extends Activity {
         builder.setSmallIcon(R.drawable.logo_png);
         builder.setContentIntent(pendingIntent);
         builder.setOngoing(true);
-        builder.setAutoCancel(true); //API level 16
+        builder.setAutoCancel(true); //API level 16h
         PendingIntent pend=pendingIntent.getActivity(FragmentChat.ctx, 0, new Intent(FragmentChat.ctx, HomeActivity.class), PendingIntent.FLAG_CANCEL_CURRENT);
         builder.setContentIntent(pend);
 //        builder.setNumber(100);
