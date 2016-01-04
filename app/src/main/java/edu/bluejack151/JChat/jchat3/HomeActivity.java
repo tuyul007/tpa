@@ -1,5 +1,8 @@
 package edu.bluejack151.JChat.jchat3;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -30,6 +33,7 @@ import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
+
 import com.firebase.client.ValueEventListener;
 import com.google.gson.Gson;
 import com.shiperus.ark.jchat3.R;
@@ -63,12 +67,11 @@ public class HomeActivity extends AppCompatActivity
     }
 
     SharedPreferences shrd;
-    public static final Firebase groupRef = new Firebase("https://jchatapps.firebaseio.com/group");
-    public static final Firebase friendRef = new Firebase("https://jchatapps.firebaseio.com/friend");
-    public static final Firebase userRef = new Firebase("https://jchatapps.firebaseio.com/user");
-    public static final Firebase chatRef = new Firebase("https://jchatapps.firebaseio.com/chat");
-    public static final Firebase groupNotifRef = new Firebase("https://jchatapps.firebaseio.com/groupnotif");
-
+    public static Firebase groupRef ;
+    public static Firebase friendRef;
+    public static Firebase userRef ;
+    public static Firebase chatRef;
+    public static Firebase groupNotifRef ;
     TextView loadingHandler;
     Boolean updateGroup = false,updateUser=false;
     Chat c;
@@ -93,7 +96,6 @@ public class HomeActivity extends AppCompatActivity
         } catch (Exception e) {
             e.printStackTrace();
         }
-
 
         return bitmap;
     }
@@ -207,6 +209,9 @@ public class HomeActivity extends AppCompatActivity
                                                             }
                                                             chatList.get(c.getGroupId()).setLastChat(c);
                                                             int notif = 0;
+                                                            if(notifSnapshot.hasChild(c.getTimeStamp()+"_"+HomeActivity.userSessionAccount.getUserId())){
+                                                                MainActivity.showNotif();
+                                                            }
                                                             if (notifSnapshot.getChildrenCount() != 0) {
                                                                 for (DataSnapshot ds : notifSnapshot.getChildren()) {
                                                                     GroupNotif gn = ds.getValue(GroupNotif.class);
@@ -239,6 +244,7 @@ public class HomeActivity extends AppCompatActivity
                                                                     chatList.get(friendId).setLastChat(c);
                                                                     if (!c.getFromId().equals(userSessionAccount.getUserId()) && c.getPrivateStatus() == 0) {
                                                                         //fire event
+                                                                        MainActivity.showNotif();
                                                                         chatList.get(friendId).setNotifCount(chatList.get(friendId).getNotifCount() + 1);
                                                                     }
                                                                     FragmentChat.updateView();
@@ -321,6 +327,14 @@ public class HomeActivity extends AppCompatActivity
     }
 
     void initComponent() {
+        Firebase.setAndroidContext(this);
+
+        groupRef = new Firebase("https://jchatapps.firebaseio.com/group");
+        friendRef = new Firebase("https://jchatapps.firebaseio.com/friend");
+        userRef = new Firebase("https://jchatapps.firebaseio.com/user");
+        chatRef = new Firebase("https://jchatapps.firebaseio.com/chat");
+        groupNotifRef = new Firebase("https://jchatapps.firebaseio.com/groupnotif");
+
         userSessionPreferences = getSharedPreferences("user_session", MODE_PRIVATE);
         userSessionAccount = new Gson().fromJson(userSessionPreferences.getString("user_session", ""), UserAccount.class);
         loadingHandler = (TextView) findViewById(R.id.loadingHandler);
@@ -404,15 +418,16 @@ public class HomeActivity extends AppCompatActivity
                 userRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot userSnapshot) {
-                        if(GroupChatActivity.set){
+                        if (GroupChatActivity.set) {
                             GroupIdentity g = dataSnapshot.getValue(GroupIdentity.class);
-                            if(g.getGroupId().equals(GroupChatActivity.listChat.getGroup().getGroupId())
-                                    && g.getAccept() == 1){
-                                GroupChatActivity.groupMember.put(g.getUserId(),userSnapshot.child(g.getUserId()).getValue(UserAccount.class));
+                            if (g.getGroupId().equals(GroupChatActivity.listChat.getGroup().getGroupId())
+                                    && g.getAccept() == 1) {
+                                GroupChatActivity.groupMember.put(g.getUserId(), userSnapshot.child(g.getUserId()).getValue(UserAccount.class));
                                 GroupChatActivity.adapter.notifyDataSetChanged();
                             }
                         }
                     }
+
                     @Override
                     public void onCancelled(FirebaseError firebaseError) {
 
@@ -536,12 +551,21 @@ public class HomeActivity extends AppCompatActivity
             }
         });
 
+
+
+
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);
          bmp2 = BitmapFactory.decodeResource(getResources(), R.drawable.com_facebook_profile_picture_blank_portrait);
         refresehNavigationDrawer();
 
     }
+
+    public static void showNotif()
+    {
+
+    }
+
     static Bitmap bmp2;
     public  static void refresehNavigationDrawer()
     {

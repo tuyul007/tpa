@@ -32,6 +32,8 @@ import edu.bluejack151.JChat.jchat3.Helper.UserAccount;
 public class FragmentChat extends android.support.v4.app.Fragment {
 
 
+
+    public static Context ctx;
     public static ArrayList<ChatAdapterItem> listChatView;
     public static ChatListAdapter adapter;
     public static ListView lv;
@@ -75,6 +77,7 @@ public class FragmentChat extends android.support.v4.app.Fragment {
                 listChatView.add(data.getValue());
             }
             if(adapter!=null){
+//                MainActivity.showNotif();
                 adapter.notifyDataSetChanged();
             }
         }
@@ -100,12 +103,14 @@ public class FragmentChat extends android.support.v4.app.Fragment {
                     GroupIdentity target = listChatView.get(position).getGroup();
                     GroupChatActivity.listChat = new ChatListItem();
                     GroupChatActivity.listChat.setGroup(target);
-
                     Intent i = new Intent(getContext(),GroupChatActivity.class);
                     startActivity(i);
                 }
             }
         });
+
+
+        ctx=getContext();
 
         return view;
     }

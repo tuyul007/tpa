@@ -1,14 +1,19 @@
 package edu.bluejack151.JChat.jchat3;
 
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.net.Uri;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -40,6 +45,7 @@ import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.google.gson.Gson;
 import com.shiperus.ark.jchat3.R;
+//import com.shiperus.ark.jchat3.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -119,18 +125,65 @@ public class MainActivity extends Activity {
 
     Firebase uploadedImageTesRef;
     String message="";
+    static NotificationManager manager;
+    static Notification myNotication;
+    static  Intent intentNotif;
+    public static void showNotif()
+    {
+
+        builder.setAutoCancel(false);
+        builder.setTicker("You Receive New Message");
+        builder.setContentTitle("JChat");
+        builder.setContentText("You Have Received New Message");
+        builder.setSmallIcon(R.drawable.logo_png);
+        builder.setContentIntent(pendingIntent);
+        builder.setOngoing(true);
+        builder.setAutoCancel(true); //API level 16
+        PendingIntent pend=pendingIntent.getActivity(FragmentChat.ctx, 0, new Intent(FragmentChat.ctx, HomeActivity.class), PendingIntent.FLAG_CANCEL_CURRENT);
+        builder.setContentIntent(pend);
+//        builder.setNumber(100);
+        builder.build();
+
+        myNotication = builder.getNotification();
+        manager.notify(11, myNotication);
+    }
+    static PendingIntent pendingIntent;
+    static Notification.Builder builder;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+
+
 
         Firebase.setAndroidContext(this);
         FacebookSdk.sdkInitialize(getApplicationContext());
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
 
+        Intent intentNotif = new Intent("com.rj.notitfications.SECACTIVITY");
+
+
+        pendingIntent = PendingIntent.getActivity(MainActivity.this, 1, intentNotif, 0);
+
+        builder = new Notification.Builder(MainActivity.this);
+
+
+
+
+
+
+
+
+
+
+        manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+
+
 //        Intent i = new Intent(getApplicationContext(), GambarDafuq.class);
 //                            startActivity(i);
+
         editor = getSharedPreferences(preferencesName, MODE_PRIVATE).edit();
         initComponent();
         userRef = new Firebase("https://jchatapps.firebaseio.com/user");
@@ -141,6 +194,12 @@ public class MainActivity extends Activity {
                 manualLoginButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+
+
+
+
+
+
                         message = "";
                         if (email.getText().toString().equals("") || password.getText().toString().equals("")) {
                             message = "All field must be filled";
@@ -187,7 +246,7 @@ public class MainActivity extends Activity {
                 new FacebookCallback<LoginResult>() {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
-                            onFacebookAccessTokenChange(loginResult.getAccessToken());
+                        onFacebookAccessTokenChange(loginResult.getAccessToken());
                         LoginManager.getInstance().logOut();
                     }
 

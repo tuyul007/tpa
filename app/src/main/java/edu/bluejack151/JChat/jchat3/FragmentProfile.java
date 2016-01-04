@@ -1,6 +1,10 @@
 package edu.bluejack151.JChat.jchat3;
 
 import android.app.Dialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -229,6 +233,18 @@ public class FragmentProfile extends android.support.v4.app.Fragment{
                     HomeActivity.userSessionAccount.setProfilePicture(imageStore);
                     HomeActivity.userRef.child(HomeActivity.userSessionAccount.getUserId()).setValue(HomeActivity.userSessionAccount);
                     HomeActivity.refresehNavigationDrawer();
+
+
+//                    NotificationManager notif=(NotificationManager)getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+//                    Notification notify=new Notification(R.drawable.button_boarder_new,"EHMMM",System.currentTimeMillis());
+//                    PendingIntent pending= PendingIntent.getActivity(getActivity().getApplicationContext(), 0, new Intent(), 0);
+//
+//
+//                    notif.notify(0,notify);
+////                    notify.setLatestEventInfo(getApplicationContext(), subject, body, pending);
+//                    notif.notify(0, notify);
+
+
                     Toast.makeText(getActivity(), "Image Changed", Toast.LENGTH_SHORT).show();
 
                         imageView.setImageDrawable(roundImage);

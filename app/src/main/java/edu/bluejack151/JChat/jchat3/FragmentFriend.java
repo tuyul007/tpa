@@ -186,6 +186,10 @@ public class FragmentFriend  extends android.support.v4.app.Fragment{
             popUpMenu1.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
+
+
+
                     if (popUpMenu1.getText().equals("Accept")) {
                         fl.getGroupIdentity().setAccept(1);
                         groupRef.child(fl.getGroupIdentity().getGroupId() + "_" +

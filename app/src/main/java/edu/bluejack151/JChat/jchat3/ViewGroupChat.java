@@ -3,6 +3,7 @@ package edu.bluejack151.JChat.jchat3;
 import android.app.Dialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -105,7 +106,7 @@ public class ViewGroupChat extends AppCompatActivity {
     void initFriendList() {
         for (int i = 0; i < HomeActivity.tempFriendList.get(1).getFriendList().size(); i++) {
             UserAccount user = HomeActivity.tempFriendList.get(1).getFriendList().get(i).getFriendDetail();
-            friendList.add(user);
+            if(GroupChatActivity.groupMember.get(user.getUserId())==null)friendList.add(user);
             checked.add(false);
         }
     }
@@ -119,6 +120,14 @@ public class ViewGroupChat extends AppCompatActivity {
 
         dialog.show();
     }
+
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        this.finish();
+
+        return true;
+    }
+
 
     @Override
     public void onBackPressed() {
